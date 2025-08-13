@@ -29,7 +29,7 @@ function addNewWord() {
     };
     
     appState.words.push(newWord);
-    alert(`لغت "${germanWord}" با موفقیت اضافه شد!`);
+    
     document.getElementById('add-word-form').reset();
     showSection('search');
   } else {
