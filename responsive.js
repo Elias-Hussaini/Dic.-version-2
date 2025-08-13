@@ -17,24 +17,35 @@ function showSection(sectionId) {
 
 // افزودن لغت جدید
 function addNewWord() {
-  const germanWord = document.getElementById('german-word').value;
-  const persianMeaning = document.getElementById('persian-meaning').value;
+  const germanInput = document.getElementById('german-word');
+  const persianInput = document.getElementById('persian-meaning');
   
-  if(germanWord && persianMeaning) {
-    const newWord = {
-      id: Date.now(),
-      german: germanWord,
-      persian: persianMeaning,
-      isFavorite: false
-    };
-    
-    appState.words.push(newWord);
-    
-    document.getElementById('add-word-form').reset();
-    showSection('search');
-  } else {
-    alert('لطفاً هر دو فیلد را پر کنید!');
+  if(!germanInput || !persianInput) {
+    console.error('عناصر فرم یافت نشدند!');
+    return;
   }
+  
+  const germanWord = germanInput.value.trim();
+  const persianMeaning = persianInput.value.trim();
+  
+  if(!germanWord || !persianMeaning) {
+    console.log('لطفاً هر دو فیلد را پر کنید');
+    return;
+  }
+  
+  const newWord = {
+    id: Date.now(),
+    german: germanWord,
+    persian: persianMeaning,
+    isFavorite: false
+  };
+  
+  appState.words.push(newWord);
+  document.getElementById('add-word-form').reset();
+  showSection('search');
+  
+  console.log('لغت جدید ذخیره شد:', newWord);
+  console.log('تمام لغات:', appState.words);
 }
 
 // مدیریت منوی موبایل
