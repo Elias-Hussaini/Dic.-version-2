@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Database Initialization
     // =====================
     async init() {
-      
+      window.dictionaryApp = this;
       await this.initDB();
       await this.loadFavorites();
       this.setupEventListeners();
@@ -574,6 +574,7 @@ async renderWordList(filter = 'all') {
     });
 
     this.setupSearchEventListeners();
+    this.setupWordListEventListeners();
 }
     async renderWordDetails(word) {
       this.currentWord = word;
@@ -1104,7 +1105,8 @@ const end = parseInt(document.getElementById('range-end').value);
       this.startWritingPractice(null, {start, end});
     }
   });
-}async startQuiz(wordIds = null, range = null) {
+}
+async startQuiz(wordIds = null, range = null) {
   let words;
   
   if (range) {
@@ -1396,6 +1398,79 @@ const end = parseInt(document.getElementById('range-end').value);
             this.showSection('search-section');
         });
     });
+}
+// این متد را به کلاس GermanDictionary اضافه کنید:
+// این متد را به کلاس GermanDictionary اضافه کنید:
+
+// متد برای تنظیم event listeners لیست لغات
+setupWordListEventListeners() {
+  document.querySelectorAll('.favorite-icon').forEach(icon => {
+    icon.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const wordId = parseInt(icon.getAttribute('data-id'));
+      await this.toggleFavorite(wordId);
+      icon.classList.toggle('active');
+      
+      // اگر در بخش علاقه‌مندی‌ها هستیم، لیست را به‌روزرسانی کنیم
+      if (document.getElementById('favorites-section').classList.contains('active')) {
+        this.renderFavorites();
+      }
+    });
+  });
+  
+  document.querySelectorAll('.view-word').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const wordId = parseInt(btn.getAttribute('data-id'));
+      const word = await this.getWord(wordId);
+      this.renderWordDetails(word);
+      this.showSection('search-section');
+    });
+  });
+  
+  document.querySelectorAll('.practice-word').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const wordId = parseInt(btn.getAttribute('data-id'));
+      this.startPracticeSession([wordId]);
+    });
+  });
+}
+// متد برای بارگذاری محتوای بخش علاقه‌مندی‌ها
+async renderFavorites() {
+  const words = await this.getAllWords();
+  const favoriteWords = words.filter(word => this.favorites.has(word.id));
+  
+  document.getElementById('favorites-section').innerHTML = `
+    <h2>لغات مورد علاقه (${favoriteWords.length})</h2>
+    
+    ${favoriteWords.length > 0 ? `
+      <div class="word-list">
+        ${favoriteWords.map(word => `
+          <div class="word-list-item" data-id="${word.id}">
+            <div class="word-list-item-header">
+              <div>
+                <span class="word-list-item-title">${word.german}</span>
+                ${word.gender ? `<span class="word-gender ${word.gender}">${this.getGenderSymbol(word.gender)}</span>` : ''}
+                ${word.type ? `<span class="word-type">${this.getTypeLabel(word.type)}</span>` : ''}
+              </div>
+              <i class="fas fa-star favorite-icon active" data-id="${word.id}"></i>
+            </div>
+            <div class="word-list-item-meaning">${word.persian}</div>
+            <div class="word-list-item-actions">
+              <button class="btn btn-sm btn-outline view-word" data-id="${word.id}">مشاهده</button>
+              <button class="btn btn-sm btn-outline practice-word" data-id="${word.id}">تمرین</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : `
+      <div class="word-card text-center">
+        <p>هیچ لغتی به علاقه‌مندی‌ها اضافه نشده است</p>
+      </div>
+    `}
+  `;
+  
+  // Add event listeners to the rendered elements
+  this.setupWordListEventListeners();
 }
     async getAllPracticeHistory() {
       return new Promise((resolve, reject) => {
@@ -1804,7 +1879,39 @@ const end = parseInt(document.getElementById('range-end').value);
         document.getElementById('verb-past').value = '';
         document.getElementById('verb-perfect').value = '';
       });
-      
+      // در متد setupEventListeners، بخش منو navigation را به این صورت به‌روزرسانی کنید:
+
+// Menu navigation
+document.querySelectorAll('.menu-item, .mobile-menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const sectionId = item.getAttribute('data-section') + '-section';
+    
+    // Special handling for some sections
+    if (sectionId === 'progress-section') {
+      this.updateStats();
+    } else if (sectionId === 'settings-section') {
+      this.renderSettings();
+    } else if (sectionId === 'quiz-section') {
+      this.startQuiz();
+    } else if (sectionId === 'practice-section') {
+      this.renderPracticeOptions();
+    } else if (sectionId === 'flashcards-section') {
+      this.startPracticeSession();
+    } else if (sectionId === 'favorites-section') {
+      this.renderFavorites();
+    } else if (sectionId === 'word-list-section') {
+      this.renderWordList();
+    }
+    
+    this.showSection(sectionId);
+    
+    // Update active menu item
+    document.querySelectorAll('.menu-item, .mobile-menu-item').forEach(i => {
+      i.classList.remove('active');
+    });
+    item.classList.add('active');
+  });
+});
       // Gender selection
       document.querySelectorAll('.gender-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1814,7 +1921,18 @@ const end = parseInt(document.getElementById('range-end').value);
           this.classList.add('active');
         });
       });
-      
+      // هایلایت جنسیت هنگام TAB
+document.querySelectorAll('.gender-btn').forEach(btn => {
+  btn.addEventListener('focus', () => {
+    btn.style.outline = '2px solid #3498db';
+    btn.style.transform = 'scale(1.05)';
+  });
+  
+  btn.addEventListener('blur', () => {
+    btn.style.outline = 'none';
+    btn.style.transform = 'scale(1)';
+  });
+});
       // Show/hide verb forms based on word type
       document.getElementById('word-type')?.addEventListener('change', function() {
         const verbFormsDiv = document.querySelector('.verb-forms');
@@ -1969,3 +2087,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById(`${sectionId}-section`).classList.add('active');
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// این کد را به انتهای فایل scripts.js اضافه کنید
+// این کد را به انتهای فایل scripts.js اضافه کنید
