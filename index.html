@@ -360,89 +360,11 @@
     </div>
 
     <script>
-        // JavaScript موقت برای نمایش اولیه
-        document.addEventListener('DOMContentLoaded', function() {
-            // تغییر بین بخش‌های مختلف
-            const menuItems = document.querySelectorAll('.menu-item');
-            const contentSections = document.querySelectorAll('.content-section');
-            
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const sectionId = this.getAttribute('data-section') + '-section';
-                    
-                    // مخفی کردن همه بخش‌ها
-                    contentSections.forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    
-                    // نمایش بخش انتخاب شده
-                    document.getElementById(sectionId).classList.add('active');
-                    
-                    // هایلایت منوی انتخاب شده
-                    menuItems.forEach(menuItem => {
-                        menuItem.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                });
-            });
-            
-            // تغییر بین تب‌های مختلف
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab') + '-content';
-                    
-                    // غیرفعال کردن همه تب‌ها
-                    tabs.forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    
-                    // مخفی کردن همه محتواها
-                    tabContents.forEach(content => {
-                        content.style.display = 'none';
-                    });
-                    
-                    // فعال کردن تب انتخاب شده
-                    this.classList.add('active');
-                    document.getElementById(tabId).style.display = 'block';
-                });
-            });
-            
-            // نمایش/مخفی کردن فرم صرف فعل بر اساس نوع کلمه
-            const wordTypeSelect = document.getElementById('word-type');
-            const verbForms = document.querySelector('.verb-forms');
-            
-            wordTypeSelect.addEventListener('change', function() {
-                if (this.value === 'verb') {
-                    verbForms.style.display = 'block';
-                } else {
-                    verbForms.style.display = 'none';
-                }
-            });
-            
-            // انتخاب جنسیت کلمه
-            const genderButtons = document.querySelectorAll('.gender-btn');
-            
-            genderButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    genderButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                });
-            });
-        });
-    </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker Registered ✅', reg.scope))
-        .catch(err => console.error('Service Worker Failed ❌', err));
-    });
-  }
+        
+        // این JS را به فایل scripts.js یا بخش <script> در HTML اضافه کنید. اگر قبلاً کد مشابهی دارید، جایگزین کنید.
+// این کد چرخش دکمه، نمایش منو، و کلیک روی ایتم‌ها برای تغییر بخش‌ها را هندل می‌کند (مشابه سایدبار دسکتاپ).
+
+
 </script>
 
     <script src="./scripts.js"></script>
@@ -452,10 +374,15 @@
 
     <!-- Mobile Menu Premium Version -->
 <!-- Mobile Menu Premium Version - Updated -->
+<!-- این بخش HTML را جایگزین بخش موبایل منو در فایل HTML خود کنید. اگر قبلاً دارید، فقط کلاس‌ها و آی‌دی‌ها را چک کنید. -->
+<!-- این کد را قبل از بستن تگ </body> قرار دهید -->
+
+<!-- دکمه منوی موبایل -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fas fa-book"></i>
 </button>
 
+<!-- منوی موبایل -->
 <div class="mobile-menu-container" id="mobileMenuContainer">
   <div class="mobile-menu-item" data-section="search">
     <i class="fas fa-search"></i>
@@ -473,6 +400,18 @@
     <i class="fas fa-pen"></i>
     <span>تمرین</span>
   </div>
+  <div class="mobile-menu-item" data-section="flashcards">
+    <i class="fas fa-layer-group"></i>
+    <span>فلش کارت‌ها</span>
+  </div>
+  <div class="mobile-menu-item" data-section="quiz">
+    <i class="fas fa-question-circle"></i>
+    <span>آزمون واژگان</span>
+  </div>
+  <div class="mobile-menu-item" data-section="word-list">
+    <i class="fas fa-list"></i>
+    <span>لیست لغات</span>
+  </div>
   <div class="mobile-menu-item" data-section="progress">
     <i class="fas fa-chart-line"></i>
     <span>پیشرفت</span>
@@ -482,5 +421,8 @@
     <span>تنظیمات</span>
   </div>
 </div>
+<!-- این کد را قبل از بستن تگ body قرار دهید -->
+<!-- این کد را قبل از بستن تگ body قرار دهید -->
+<input type="file" id="import-file-input" style="display: none;" accept=".json">
 </body>
 </html>
