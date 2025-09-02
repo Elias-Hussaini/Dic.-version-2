@@ -1976,4 +1976,1035 @@ textarea.form-control {
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);  /* درخشندگی با shadow طلایی */
   animation: pulse-number 1.5s infinite ease-in-out;  /* انیمیشن حرکت ملایم (pulse) */
 }
+/* این CSS را جایگزین بخش موبایل منو و ریسپانسیو در فایل styles.css یا فایل CSS اصلی خود کنید. 
+   من افکت‌های خاصی اضافه کردم: چرخش دکمه به صورت 45 درجه (مثل تبدیل + به X، اما برای آیکون کتاب چرخش نرم)، 
+   انیمیشن پاپ‌آپ ایتم‌ها با تأخیر (stagger animation) برای ظاهر شدن یکی یکی از پایین به بالا، 
+   هور افکت با گلو (glow) و اسکال نرم، و همچنین ریسپانسیو کامل برای تمام عناصر اپ (سرچ باکس، کارت‌ها، تب‌ها، فرم‌ها و غیره).
+   همه ویژگی‌های دسکتاپ (سایدبار، کارت‌ها، تب‌ها) در موبایل بدون مشکل کار می‌کنند - سایدبار در موبایل مخفی می‌شود و موبایل منو جایگزین می‌شود. */
+
+/* Mobile Menu Button - Premium Style with Rotation and Glow */
+.mobile-menu-btn {
+  position: fixed !important;
+  left: 20px !important;
+  bottom: 20px !important;
+  z-index: 9999 !important;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #ff3366, #ff4d88) !important;
+  color: white !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: 24px !important;
+  box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4) !important;
+  cursor: pointer !important;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+  border: none !important;
+  outline: none !important;
+  animation: pulse 2s infinite ease-in-out !important;
+}
+
+.mobile-menu-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 20px rgba(255, 51, 102, 0.6) !important;
+}
+
+.mobile-menu-btn.rotated {
+  transform: rotate(45deg) scale(1.1) !important; /* چرخش 45 درجه وقتی کلیک می‌شود - می‌تونی به 90deg تغییر بدی اگر می‌خوای */
+  background: linear-gradient(135deg, #ff4d88, #ff3366) !important; /* معکوس کردن گرادیانت برای افکت */
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.8) !important; /* گلو (درخشندگی) اضافه شده */
+}
+
+/* Mobile Menu Container with Pop-up Animation */
+.mobile-menu-container {
+  position: fixed !important;
+  left: 20px !important;
+  bottom: 90px !important; /* کمی بالاتر از دکمه برای پاپ‌آپ از پایین */
+  z-index: 9998 !important;
+  width: 280px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(30px) scale(0.95) !important;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+  padding: 15px 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.mobile-menu-container.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* Mobile Menu Items with Staggered Pop-up and Glow Hover */
+.mobile-menu-item {
+  padding: 14px 24px !important;
+  margin: 4px 8px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  color: #333 !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  opacity: 0 !important;
+  transform: translateY(20px) !important; /* شروع از پایین */
+  transition: all 0.4s ease !important; /* ترنزیشن نرم */
+}
+
+.mobile-menu-container.active .mobile-menu-item {
+  opacity: 1 !important;
+  transform: translateY(0) !important; /* پاپ‌آپ به بالا */
+}
+
+/* Stagger Delay for Items - یکی یکی ظاهر شدن */
+.mobile-menu-item:nth-child(1) { transition-delay: 0.05s !important; }
+.mobile-menu-item:nth-child(2) { transition-delay: 0.1s !important; }
+.mobile-menu-item:nth-child(3) { transition-delay: 0.15s !important; }
+.mobile-menu-item:nth-child(4) { transition-delay: 0.2s !important; }
+.mobile-menu-item:nth-child(5) { transition-delay: 0.25s !important; }
+.mobile-menu-item:nth-child(6) { transition-delay: 0.3s !important; }
+.mobile-menu-item:nth-child(7) { transition-delay: 0.35s !important; }
+.mobile-menu-item:nth-child(8) { transition-delay: 0.4s !important; }
+.mobile-menu-item:nth-child(9) { transition-delay: 0.45s !important; }
+
+.mobile-menu-item:hover {
+  background: linear-gradient(90deg, rgba(255, 51, 102, 0.15), rgba(255, 51, 102, 0.05)) !important;
+  transform: translateX(5px) scale(1.02) !important; /* اسکال کوچک و حرکت به راست */
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.3) !important; /* گلو روی هور */
+  color: #ff3366 !important;
+}
+
+.mobile-menu-item i {
+  margin-left: 12px !important;
+  font-size: 20px !important;
+  width: 25px !important;
+  text-align: center !important;
+}
+
+/* Color Variations for Items (افکت خاص اضافه شده) */
+.mobile-menu-item[data-section="search"] i { color: #3498db !important; }
+.mobile-menu-item[data-section="add-word"] i { color: #2ecc71 !important; }
+.mobile-menu-item[data-section="favorites"] i { color: #f1c40f !important; }
+.mobile-menu-item[data-section="practice"] i { color: #e67e22 !important; }
+.mobile-menu-item[data-section="flashcards"] i { color: #9b59b6 !important; }
+.mobile-menu-item[data-section="quiz"] i { color: #1abc9c !important; }
+.mobile-menu-item[data-section="word-list"] i { color: #34495e !important; }
+.mobile-menu-item[data-section="progress"] i { color: #27ae60 !important; }
+.mobile-menu-item[data-section="settings"] i { color: #7f8c8d !important; }
+
+.mobile-menu-item:hover i { color: #ff3366 !important; } /* تغییر رنگ آیکون روی هور */
+
+/* Animations */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
+  70% { box-shadow: 0 0 0 12px rgba(255, 51, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+}
+
+/* Responsive Adjustments - Hide Mobile Menu on Desktop, Hide Sidebar on Mobile */
+@media (min-width: 993px) {
+  .mobile-menu-btn, .mobile-menu-container {
+    display: none !important;
+  }
+  .sidebar {
+    display: block !important; /* سایدبار در دسکتاپ نمایش داده شود */
+  }
+  .main-content {
+    margin-left: 280px !important; /* فضای سایدبار در دسکتاپ */
+  }
+}
+
+@media (max-width: 992px) {
+  .sidebar {
+    display: none !important; /* مخفی کردن سایدبار در موبایل و تبلت */
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  .mobile-menu-container {
+    display: block !important;
+  }
+  .main-content {
+    margin-left: 0 !important; /* حذف حاشیه در موبایل */
+    padding: 15px !important;
+  }
+  /* تنظیم عناصر اصلی برای موبایل */
+  .search-box {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .search-input {
+    width: 100% !important;
+    border-radius: 8px !important;
+  }
+  .search-btn {
+    width: 100% !important;
+    border-radius: 8px !important;
+  }
+  .word-card {
+    padding: 15px !important;
+    font-size: 0.95rem !important;
+  }
+  .word-title {
+    font-size: 1.4rem !important;
+  }
+  .tab-container {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+  }
+  .tab {
+    font-size: 0.9rem !important;
+    padding: 8px 12px !important;
+  }
+  .action-buttons {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .btn {
+    width: 100% !important;
+  }
+  .form-group {
+    margin-bottom: 12px !important;
+  }
+  .gender-options {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .verb-form-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .word-list {
+    grid-template-columns: 1fr !important;
+  }
+  .flashcard {
+    height: 250px !important;
+  }
+  .quiz-options {
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-container {
+    width: calc(100% - 40px) !important; /* عرض کامل در گوشی‌های کوچک */
+    left: 20px !important;
+  }
+  .word-card {
+    padding: 12px !important;
+  }
+  .header-title {
+    font-size: 1.4rem !important;
+  }
+  .example {
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-menu-btn {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 20px !important;
+    left: 15px !important;
+    bottom: 15px !important;
+  }
+  .mobile-menu-container {
+    bottom: 75px !important;
+    width: calc(100% - 30px) !important;
+    left: 15px !important;
+    border-radius: 16px !important;
+  }
+  .mobile-menu-item {
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+  }
+  .word-title {
+    font-size: 1.2rem !important;
+  }
+  .word-gender {
+    font-size: 0.7rem !important;
+  }
+  .tab {
+    padding: 6px 10px !important;
+    font-size: 0.8rem !important;
+  }
+  .form-control {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Dark Mode Adjustments for Mobile */
+.dark-mode .mobile-menu-container {
+  background: rgba(45, 45, 45, 0.98) !important;
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .mobile-menu-item {
+  color: #f0f0f0 !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .mobile-menu-item:hover {
+  background: linear-gradient(90deg, rgba(255, 51, 102, 0.2), rgba(255, 51, 102, 0.1)) !important;
+  color: #ff3366 !important;
+}
+
+/* این کد را به فایل styles.css اضافه کنید */
+
+/* استایل دکمه منوی موبایل */
+
+
+
+
+.mobile-menu-btn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4361ee, #3a56d4);
+  color: white;
+  border: none;
+  font-size: 24px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn.active {
+  transform: rotate(90deg);
+  background: linear-gradient(135deg, #3a56d4, #2f48a9);
+}
+
+/* استایل منوی موبایل */
+.mobile-menu-container {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  left: 20px;
+  z-index: 999;
+  width: 280px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding: 15px 0;
+}
+
+.mobile-menu-container.active {
+  display: block;
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* آیتم‌های منوی موبایل */
+.mobile-menu-item {
+  padding: 15px 20px;
+  margin: 5px 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.mobile-menu-item:hover {
+  background: rgba(67, 97, 238, 0.1);
+  transform: translateX(-5px);
+  color: #4361ee;
+}
+
+.mobile-menu-item i {
+  margin-left: 12px;
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+/* انیمیشن برای دکمه موبایل */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+  }
+}
+
+.mobile-menu-btn {
+  animation: pulse 2s infinite;
+}
+
+/* نمایش دکمه منو فقط در موبایل */
+@media (max-width: 992px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .main-content {
+    margin-right: 0;
+  }
+}
+
+
+
+/* این استایل‌ها را به فایل CSS اضافه کنید: */
+
+/* استایل برای حالت تاریک */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+body.dark-mode .word-card {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+body.dark-mode .search-box input {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-color: #444;
+}
+
+/* استایل برای دکمه سوئیچ */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* استایل برای range selector */
+.range-selector {
+  margin-bottom: 15px;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.range-inputs input {
+  width: 80px;
+  text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* استایل برای دکمه کتاب (با افکت درخشش همیشگی) */
+  .mobile-menu-btn {
+    position: fixed;
+    bottom: 25px;
+    
+    transform: translateX(-50%);
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px 8px rgba(255, 154, 158, 0.7);
+    cursor: pointer;
+    z-index: 1000;
+    border: none;
+   animation: glow 2s infinite alternate;
+  }
+
+  /* انیمیشن درخشش همیشگی */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 154, 158, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px rgba(255, 154, 158, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 154, 158, 0.5);
+  }
+}
+
+  .mobile-menu-btn i {
+    color: white;
+    font-size: 26px;
+    transition: transform 0.5s ease;
+  }
+
+  /* استایل برای منوهایی که با کلیک روی کتاب باز می‌شوند */
+  .mobile-menu-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    opacity: 0;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .mobile-menu-container.open {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .mobile-menu-item {
+    padding: 14px 20px;
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .mobile-menu-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  /* چرخش کتاب دور خودش مثل زمین */
+  .rotate-book {
+    animation: rotate 2s infinite linear;
+  }
+
+  .rotate-book-paused {
+    animation-play-state: paused;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+      transform: translateX(-50%) rotate(360deg);
+    }
+  }
+
+  /* استایل برای دکمه‌های مشاهده و تمرین در لیست لغات */
+  .word-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+  }
+
+  .view-btn, .exercise-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    border: none;
+    width: 110px;
+    text-align: center;
+  }
+
+  .view-btn {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: white;
+  }
+
+  .view-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(66, 153, 225, 0.4);
+  }
+
+  .exercise-btn {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+  }
+
+  .exercise-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+  }
+
+
+
+
+
+  /* برای همه دکمه‌ها در لیست لغات */
+.word-list button,
+.word-list .btn,
+.action-buttons button {
+  padding: 10px 20px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* برای دکمه‌های مشاهده و تمرین */
+.view-btn, .exercise-btn {
+  padding: 5px 10px !important;
+  border-radius: 30px !important;
+  min-width: 120px !important;
+  font-size: 16px !important;
+}
+
+/* برای دکمه‌های علاقه‌مندی‌ها */
+.favorites-btn {
+  padding: 15px 25px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+}
+
+
+/* برای دکمه‌های فیلتر بالای لیست لغات */
+.filter-buttons button,
+.category-btn {
+  padding: 15px 25px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin: 5px !important;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #aabaff 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* دکمه "همه" */
+.filter-buttons button.all-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* دکمه "علاقه‌مندی‌ها" */
+.filter-buttons button.favorites-btn {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+}
+
+/* دکمه "اسم‌ها" */
+.filter-buttons button.nouns-btn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* دکمه "فعل‌ها" */
+.filter-buttons button.verbs-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) ;
+}
+
+
+
+/* برای دکمه‌های بخش آزمون - بعدی و رد کردن */
+#quiz-section .btn,
+#quiz-section .btn-primary,
+#quiz-section .btn-outline {
+  padding: 15px 30px !important;
+  border-radius: 30px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  margin: 10px 5px !important;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+  min-width: 140px;
+  text-align: center;
+}
+
+/* دکمه بعدی (btn-primary) */
+#quiz-section .btn-primary {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+  color: white !important;
+}
+
+#quiz-section .btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 15px rgba(67, 233, 123, 0.4) !important;
+}
+
+#quiz-section .btn-primary:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* دکمه رد کردن (btn-outline) */
+#quiz-section .btn-outline {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%) !important;
+  color: white !important;
+}
+
+#quiz-section .btn-outline:hover:not(:disabled) {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 15px rgba(255, 154, 158, 0.4) !important;
+}
+
+#quiz-section .btn-outline:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* برای دکمه‌های نتایج آزمون */
+#quiz-section .action-buttons .btn {
+  padding: 15px 30px !important;
+  border-radius: 30px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  margin: 10px 5px !important;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+  min-width: 180px;
+}
+
+#quiz-section .action-buttons .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+#quiz-section .action-buttons .btn-outline {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  color: white !important;
+}
+
+
+
+
+
+/* برای دکمه جستجو با استایل مستقل */
+.search-box {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 15px 20px !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-box button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 15px 25px !important;
+  border-radius: 30px !important;
+  cursor: pointer;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.search-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+}
+
+
+
+/* برای دکمه‌های بخش اضافه کردن لغت جدید */
+#add-word-section .btn,
+#add-word-section .gender-btn,
+#add-word-section #save-word-btn {
+  padding: 15px 25px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  margin: 8px 5px !important;
+  border: none !important;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+  text-align: center;
+  min-width: 120px;
+}
+
+/* دکمه‌های جنسیت */
+#add-word-section .gender-btn.masculine {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+  color: white !important;
+}
+
+#add-word-section .gender-btn.feminine {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+  color: white !important;
+}
+
+#add-word-section .gender-btn.neuter {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+  color: white !important;
+}
+
+#add-word-section .gender-btn.none {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%) !important;
+  color: white !important;
+}
+
+#add-word-section .gender-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* دکمه ذخیره لغت */
+#add-word-section #save-word-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 18px 30px !important;
+  font-size: 18px !important;
+  min-width: 180px;
+  margin-top: 20px !important;
+}
+
+#add-word-section #save-word-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* برای dropdown نوع کلمه */
+#add-word-section #word-type {
+  padding: 15px 20px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 8px 0 !important;
+}
+
+#add-word-section #word-type:focus {
+  outline: none;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* برای فیلدهای ورودی */
+#add-word-section .form-control {
+  padding: 15px 20px !important;
+  border-radius: 30px !important;
+  font-size: 16px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 8px 0 !important;
+}
+
+#add-word-section .form-control:focus {
+  outline: none;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+
+
+/* برای ستاره علاقه‌مندی‌ها */
+.favorite-icon {
+  color: #ccc !important;
+  cursor: pointer;
+  font-size: 20px !important;
+  transition: all 0.3s ease !important;
+  margin-left: 10px;
+}
+
+.favorite-icon.active {
+  color: #ffc107 !important;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+}
+
+.favorite-icon:hover {
+  transform: scale(1.2);
+}
+
+/* برای دکمه تلفظ */
+.pronunciation-icon {
+  color: #667eea !important;
+  cursor: pointer;
+  font-size: 20px !important;
+  transition: all 0.3s ease !important;
+  margin-left: 10px;
+}
+
+.pronunciation-icon.playing {
+  color: #e74c3c !important;
+  animation: pulse 1s infinite;
+}
+
+.pronunciation-icon:hover {
+  transform: scale(1.2);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/*new elias */
+
+
+
+
+
+
+.main-content {
+ margin-left: 0% !important;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
