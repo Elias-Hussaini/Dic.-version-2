@@ -50,6 +50,10 @@ class GermanDictionary {
     constructor() {
         // کدهای موجود...
         
+     
+      window.addEventListener('resize', () => {
+  this.handleResponsive();
+});
         // ایجاد global reference
         window.dictionaryApp = this;
         
