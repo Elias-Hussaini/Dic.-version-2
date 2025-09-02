@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <!-- متا تگ‌های توصیفی -->
-<meta name="application-name" content="Elias.DI">
+<meta name="application-name" content="دیکشنری آلمانی-فارسی">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="msapplication-starturl" content="/">
     <style>
@@ -173,9 +173,6 @@
             <div class="logo">
                 <i class="fas fa-book"></i> Elias.DI
             </div>
-            
-            
-            
             <div class="menu-item" data-section="search">
                 <i class="fas fa-search"></i>
                 <span>جستجو</span>
@@ -189,14 +186,13 @@
                 <span>علاقه‌مندی‌ها</span>
             </div>
             <div class="menu-item" data-section="practice">
-  <i class="fas fa-pen"></i>
-  <span>تمرین</span>
-  
-</div>
-<div class="menu-item" data-section="flashcards">
-  <i class="fas fa-layer-group"></i>
-  <span>فلش کارت‌ها</span>
-</div>
+                <i class="fas fa-pen"></i>
+                <span>تمرین</span>
+            </div>
+            <div class="menu-item" data-section="flashcards">
+                <i class="fas fa-layer-group"></i>
+                <span>فلش کارت‌ها</span>
+            </div>
             <div class="menu-item" data-section="quiz">
                 <i class="fas fa-question-circle"></i>
                 <span>آزمون واژگان</span>
@@ -204,7 +200,6 @@
             <div class="menu-item" data-section="word-list">
                 <i class="fas fa-list"></i>
                 <span>لیست لغات</span>
-                
             </div>
             <div class="menu-item" data-section="progress">
                 <i class="fas fa-chart-line"></i>
@@ -272,23 +267,19 @@
                 <div class="word-card">
                     <div class="form-group">
                         <label for="german-word">لغت آلمانی:</label>
-                        <input type="text" id="german-word" class="form-control" inputmode="latin" lang="de"
-       autocomplete="off" autocorrect="off" autocapitalize="off"
-       placeholder="لغت آلمانی..." >
+                        <input type="text" id="german-word" class="form-control" >
                     </div>
                     <div class="form-group">
                         <label for="persian-meaning">معنی فارسی:</label>
-                        <input type="text" id="persian-meaning" class="form-control" inputmode="persian" lang="fa"
-       autocomplete="off" autocorrect="off" autocapitalize="off"
-       placeholder="معنی فارسی...">
+                        <input type="text" id="persian-meaning" class="form-control" >
                     </div>
                     <div class="form-group">
                         <label>جنسیت:</label>
                         <div class="gender-options">
-                            <button class="gender-btn masculine" data-gender="masculine" tabindex="0" @focus="highlightGender" @blur="unhighlightGender">مذکر (der)</button>
-                            <button class="gender-btn feminine" data-gender="feminine" tabindex="0" @focus="highlightGender" @blur="unhighlightGender">مونث (die)</button>
-                            <button class="gender-btn neuter" data-gender="neuter" tabindex="0" @focus="highlightGender" @blur="unhighlightGender">خنثی (das)</button>
-                            <button class="gender-btn none" data-gender="none" tabindex="0"@focus="highlightGender" @blur="unhighlightGender">بدون جنسیت</button>
+                            <button class="gender-btn masculine" data-gender="masculine">مذکر (der)</button>
+                            <button class="gender-btn feminine" data-gender="feminine">مونث (die)</button>
+                            <button class="gender-btn neuter" data-gender="neuter">خنثی (das)</button>
+                            <button class="gender-btn none" data-gender="none">بدون جنسیت</button>
                         </div>
                     </div>
                     <div class="form-group">
@@ -360,25 +351,99 @@
     </div>
 
     <script>
-        
-        // این JS را به فایل scripts.js یا بخش <script> در HTML اضافه کنید. اگر قبلاً کد مشابهی دارید، جایگزین کنید.
-// این کد چرخش دکمه، نمایش منو، و کلیک روی ایتم‌ها برای تغییر بخش‌ها را هندل می‌کند (مشابه سایدبار دسکتاپ).
-
-
+        // JavaScript موقت برای نمایش اولیه
+        document.addEventListener('DOMContentLoaded', function() {
+            // تغییر بین بخش‌های مختلف
+            const menuItems = document.querySelectorAll('.menu-item');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section') + '-section';
+                    
+                    // مخفی کردن همه بخش‌ها
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // نمایش بخش انتخاب شده
+                    document.getElementById(sectionId).classList.add('active');
+                    
+                    // هایلایت منوی انتخاب شده
+                    menuItems.forEach(menuItem => {
+                        menuItem.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // تغییر بین تب‌های مختلف
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab') + '-content';
+                    
+                    // غیرفعال کردن همه تب‌ها
+                    tabs.forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // مخفی کردن همه محتواها
+                    tabContents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // فعال کردن تب انتخاب شده
+                    this.classList.add('active');
+                    document.getElementById(tabId).style.display = 'block';
+                });
+            });
+            
+            // نمایش/مخفی کردن فرم صرف فعل بر اساس نوع کلمه
+            const wordTypeSelect = document.getElementById('word-type');
+            const verbForms = document.querySelector('.verb-forms');
+            
+            wordTypeSelect.addEventListener('change', function() {
+                if (this.value === 'verb') {
+                    verbForms.style.display = 'block';
+                } else {
+                    verbForms.style.display = 'none';
+                }
+            });
+            
+            // انتخاب جنسیت کلمه
+            const genderButtons = document.querySelectorAll('.gender-btn');
+            
+            genderButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    genderButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker Registered ✅', reg.scope))
+        .catch(err => console.error('Service Worker Failed ❌', err));
+    });
+  }
 </script>
 
     <script src="./scripts.js"></script>
     <script src="./sw.js"></script>
     <script src="./install.js"></script>
-    <script src="responsive.js"></script>
+    <script src="./responsive.js"></script>
 
-    <!-- Mobile Menu Premium Version -->
-<!-- Mobile Menu Premium Version - Updated -->
-<!-- این بخش HTML را جایگزین بخش موبایل منو در فایل HTML خود کنید. اگر قبلاً دارید، فقط کلاس‌ها و آی‌دی‌ها را چک کنید. -->
-<!-- این کد را قبل از بستن تگ </body> قرار دهید -->
 
-<!-- دکمه منوی موبایل -->
-<button class="mobile-menu-btn" id="mobileMenuBtn">
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fas fa-book"></i>
 </button>
 
@@ -421,8 +486,5 @@
     <span>تنظیمات</span>
   </div>
 </div>
-<!-- این کد را قبل از بستن تگ body قرار دهید -->
-<!-- این کد را قبل از بستن تگ body قرار دهید -->
-<input type="file" id="import-file-input" style="display: none;" accept=".json">
 </body>
 </html>
