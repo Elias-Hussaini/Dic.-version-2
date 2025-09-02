@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // =====================
   class GermanDictionary {
     constructor() {
-      this.dbName = 'GermanPersianDictionary';
+   this.dbName = 'GermanPersianDictionary';
       this.dbVersion = 2;
       this.db = null;
       this.currentWord = null;
@@ -49,8 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =====================
     // Database Initialization
     // =====================
-    async init() {
-      window.dictionaryApp = this;
+      async init() {
       await this.initDB();
       await this.loadFavorites();
       this.setupEventListeners();
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
           .catch(err => console.log('Service Worker registration failed', err));
       }
     }
-    
+
     initDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open(this.dbName, this.dbVersion);
@@ -106,69 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
           reject(event.target.error);
         };
       });
-      
     }
-    showToast(message, type = 'info') {
-  // ابتدا toast قبلی را حذف کنیم اگر وجود دارد
-  const existingToast = document.querySelector('.toast');
-  if (existingToast) {
-    existingToast.remove();
-  }
 
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <i class="fas ${type === 'success' ? 'fa-check-circle' : 
-                     type === 'error' ? 'fa-times-circle' : 
-                     type === 'warning' ? 'fa-exclamation-circle' :
-                     'fa-info-circle'}"></i>
-    <span>${message}</span>
-    <i class="fas fa-times toast-close"></i>
-  `;
-  
-  document.body.appendChild(toast);
-  
-  // محاسبه موقعیت برای عدم تداخل با منو
-  const sidebar = document.querySelector('.sidebar');
-  const sidebarWidth = sidebar ? sidebar.offsetWidth : 0;
-  toast.style.left = `calc(50% + ${sidebarWidth / 2}px)`;
-  
-  // برای ریسپانسیو بودن موقعیت
-  const updateToastPosition = () => {
-    if (window.innerWidth < 992) {
-      toast.style.left = '50%';
-    } else {
-      toast.style.left = `calc(50% + ${sidebarWidth / 2}px)`;
-    }
-  };
-  
-  window.addEventListener('resize', updateToastPosition);
-  updateToastPosition();
-
-  // Auto remove after 5 seconds
-  const removeToast = () => {
-    toast.style.animation = 'fadeOut 0.3s ease-in-out';
-    setTimeout(() => {
-      toast.remove();
-      window.removeEventListener('resize', updateToastPosition);
-    }, 300);
-  };
-  
-  setTimeout(removeToast, 1500);
-  
-  // Close button
-  toast.querySelector('.toast-close').addEventListener('click', removeToast);
-  
-  // اضافه کردن انیمیشن fadeOut
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @keyframes fadeOut {
-      from { opacity: 1; top: ${toast.style.top}; }
-      to { opacity: 0; top: 0; }
-    }
-  `;
-  document.head.appendChild(style);
-}
     // =====================
     // Word CRUD Operations
     // =====================
@@ -234,18 +172,31 @@ document.addEventListener('DOMContentLoaded', function() {
         request.onerror = (event) => reject(event.target.error);
       });
     }
-
-    async getAllWords() {
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction(['words'], 'readonly');
-        const store = transaction.objectStore('words');
-        const request = store.getAll();
-        
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = (event) => reject(event.target.error);
-      });
+async getAllWords() {
+  return new Promise((resolve, reject) => {
+    // بررسی اینکه دیتابیس آماده است
+    if (!this.db) {
+      console.warn('Database not ready, returning empty array');
+      resolve([]);
+      return;
     }
 
+    try {
+      const transaction = this.db.transaction(['words'], 'readonly');
+      const store = transaction.objectStore('words');
+      const request = store.getAll();
+      
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = (event) => {
+        console.error('Error in getAllWords:', event.target.error);
+        resolve([]); // بازگرداندن آرایه خالی به جای reject
+      };
+    } catch (error) {
+      console.error('Error in getAllWords:', error);
+      resolve([]);
+    }
+  });
+}
     async deleteWord(id) {
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction(['words'], 'readwrite');
@@ -1607,7 +1558,8 @@ async renderFavorites() {
       this.showToast('داده‌ها با موفقیت صادر شد', 'success');
     }
 
-    async importData(file) {
+   // این متد importData جدید را جایگزین کنید
+async importData(file) {
   if (!file) return;
 
   try {
@@ -1618,60 +1570,55 @@ async renderFavorites() {
       throw new Error('فرمت فایل نامعتبر است');
     }
 
-    // 1. حذف دیتابیس موجود
-    await new Promise((resolve, reject) => {
-      const req = indexedDB.deleteDatabase(this.dbName);
-      req.onsuccess = resolve;
-      req.onerror = reject;
-    });
+    // 1. پاک کردن داده‌های موجود
+    await this.clearAllData();
 
-    // 2. راه‌اندازی مجدد دیتابیس
-    await this.initDB();
+    // 2. وارد کردن داده‌های جدید
+    const transaction = this.db.transaction(
+      ['words', 'favorites', 'examples', 'practiceHistory'], 
+      'readwrite'
+    );
 
-    // 3. اضافه کردن داده‌های جدید
-    await new Promise((resolve, reject) => {
-      const transaction = this.db.transaction(['words', 'favorites', 'examples', 'practiceHistory'], 'readwrite');
-      
-      const wordsStore = transaction.objectStore('words');
+    // وارد کردن لغات
+    const wordsStore = transaction.objectStore('words');
+    for (const word of data.words) {
+      wordsStore.add(word);
+    }
+
+    // وارد کردن علاقه‌مندی‌ها
+    if (data.favorites && Array.isArray(data.favorites)) {
       const favoritesStore = transaction.objectStore('favorites');
+      for (const favorite of data.favorites) {
+        favoritesStore.add(favorite);
+      }
+    }
+
+    // وارد کردن مثال‌ها
+    if (data.examples && Array.isArray(data.examples)) {
       const examplesStore = transaction.objectStore('examples');
+      for (const example of data.examples) {
+        examplesStore.add(example);
+      }
+    }
+
+    // وارد کردن تاریخچه تمرین
+    if (data.practiceHistory && Array.isArray(data.practiceHistory)) {
       const practiceStore = transaction.objectStore('practiceHistory');
-
-      // اضافه کردن لغات
-      data.words.forEach(word => {
-        wordsStore.add(word);
-      });
-
-      // اضافه کردن علاقه‌مندی‌ها
-      if (data.favorites && Array.isArray(data.favorites)) {
-        data.favorites.forEach(fav => {
-          favoritesStore.add(fav);
-        });
+      for (const record of data.practiceHistory) {
+        practiceStore.add(record);
       }
+    }
 
-      // اضافه کردن مثال‌ها
-      if (data.examples && Array.isArray(data.examples)) {
-        data.examples.forEach(ex => {
-          examplesStore.add(ex);
-        });
-      }
-
-      // اضافه کردن تاریخچه تمرین
-      if (data.practiceHistory && Array.isArray(data.practiceHistory)) {
-        data.practiceHistory.forEach(rec => {
-          practiceStore.add(rec);
-        });
-      }
-
-      transaction.oncomplete = () => {
-        this.loadFavorites().then(resolve).catch(reject);
-      };
-
-      transaction.onerror = (event) => {
-        reject(event.target.error);
-      };
+    // منتظر اتمام تراکنش
+    await new Promise((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject(event.target.error);
     });
 
+    // 3. بارگذاری مجدد داده‌ها
+    await this.loadFavorites();
+    
+    // 4. بروزرسانی UI
     this.showToast('داده‌ها با موفقیت وارد شدند', 'success');
     this.renderWordList();
     this.updateStats();
@@ -1680,6 +1627,25 @@ async renderFavorites() {
     console.error('Import error:', error);
     this.showToast('خطا در وارد کردن داده‌ها: ' + error.message, 'error');
   }
+}
+
+// این متد جدید را اضافه کنید
+async clearAllData() {
+  return new Promise((resolve, reject) => {
+    const transaction = this.db.transaction(
+      ['words', 'favorites', 'examples', 'practiceHistory'], 
+      'readwrite'
+    );
+
+    // پاک کردن همه داده‌ها
+    transaction.objectStore('words').clear();
+    transaction.objectStore('favorites').clear();
+    transaction.objectStore('examples').clear();
+    transaction.objectStore('practiceHistory').clear();
+
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = (event) => reject(event.target.error);
+  });
 }
     async clearDatabase() {
       return new Promise((resolve, reject) => {
@@ -1702,7 +1668,6 @@ async renderFavorites() {
       localStorage.clear();
       location.reload();
     }
-
     // =====================
     // Helper Methods
     // =====================
