@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -171,8 +172,18 @@
         <!-- سایدبار -->
         <div class="sidebar">
             <div class="logo">
-                <i class="fas fa-book"></i> Elias.DI
+                
+         <i class="fas fa-graduation-cap" style="animation: slow-rotate 30s linear infinite;"></i><br>Elias.Dictionary
             </div>
+              <div class="sidebar-quick-search">
+    <div class="search-input-wrapper">
+      <input type="text" id="sidebar-quick-search" placeholder="جستجوی سریع...">
+      <button id="sidebar-search-trigger">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+  
             <div class="menu-item" data-section="search">
                 <i class="fas fa-search"></i>
                 <span>جستجو</span>
@@ -258,6 +269,9 @@
                         <button class="btn btn-primary">افزودن مثال جدید</button>
                         <button class="btn btn-outline">تمرین این لغت</button>
                     </div>
+                        <button class="btn btn-primary" id="fullscreen-toggle" onclick="toggleFullscreen()">
+            <i class="fas fa-expand"></i> فول اسکرین
+        </button>
                 </div>
             </div>
 
@@ -349,8 +363,61 @@
             </div>
         </div>
     </div>
+    <script>let isFullscreen = false;
+
+function toggleFullscreen() {
+    const fullscreenBtn = document.getElementById('fullscreen-toggle');
+    
+    if (!isFullscreen) {
+        // رفتن به فول اسکرین
+        const elem = document.documentElement;
+        
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().then(() => {
+                isFullscreen = true;
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> خروج از فول اسکرین';
+            }).catch(err => {
+                console.log('خطا در فول اسکرین:', err);
+            });
+        }
+    } else {
+        // خروج از فول اسکرین
+        if (document.exitFullscreen) {
+            document.exitFullscreen().then(() => {
+                isFullscreen = false;
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> فول اسکرین';
+            });
+        }
+    }
+}
+
+// بررسی وضعیت فول اسکرین
+function checkFullscreenState() {
+    const fullscreenBtn = document.getElementById('fullscreen-toggle');
+    
+    if (document.fullscreenElement || 
+        document.webkitFullscreenElement || 
+        document.msFullscreenElement) {
+        isFullscreen = true;
+        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> خروج از فول اسکرین';
+    } else {
+        isFullscreen = false;
+        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> فول اسکرین';
+    }
+}
+
+// رویدادهای تغییر وضعیت فول اسکرین
+document.addEventListener('fullscreenchange', checkFullscreenState);
+document.addEventListener('webkitfullscreenchange', checkFullscreenState);
+document.addEventListener('msfullscreenchange', checkFullscreenState);
+
+// وقتی صفحه لود شد
+document.addEventListener('DOMContentLoaded', function() {
+    checkFullscreenState();
+});</script>
 
     <script>
+        
         // JavaScript موقت برای نمایش اولیه
         document.addEventListener('DOMContentLoaded', function() {
             // تغییر بین بخش‌های مختلف
