@@ -1136,8 +1136,7 @@ async checkListeningAnswer() {
     const normalizedCorrectAnswer = currentWord.german.toLowerCase().trim();
 
     this.listeningSession.attempts++;
-    const isCorrect = userAnswer.toLowerCase() === currentWord.german.toLowerCase();
-    
+    const isCorrect = normalizedUserAnswer === normalizedCorrectAnswer;
     // ذخیره نتیجه برای نمایش در نمودار پیشرفت
     currentWord.userCorrect = isCorrect;
     
@@ -1377,7 +1376,7 @@ async checkWritingAnswer() {
     const normalizedUserAnswer = userAnswer.toLowerCase().trim();
     const normalizedCorrectAnswer = currentWord.german.toLowerCase().trim();
 
-    const isCorrect = userAnswer.toLowerCase() === currentWord.german.toLowerCase();
+    const isCorrect = normalizedUserAnswer === normalizedCorrectAnswer;
     currentWord.userCorrect = isCorrect;
     
     if (isCorrect) {
@@ -1402,8 +1401,7 @@ async checkWritingAnswer() {
         this.showToast('لطفاً پاسخ خود را وارد کنید', 'warning');
         return;
     }
-
-    const isCorrect = userAnswer.toLowerCase() === currentWord.german.toLowerCase();
+const isCorrect = selectedAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
     currentWord.userCorrect = isCorrect;
     
     if (isCorrect) {
@@ -1690,9 +1688,8 @@ async checkSentenceAnswer() {
  const normalizedUserSentence = userSentence.toLowerCase();
     const normalizedCorrectWord = currentWord.german.toLowerCase();
     // بررسی ساده - فقط وجود لغت در جمله
-    const containsWord = userSentence.toLowerCase().includes(currentWord.german.toLowerCase());
+       const containsWord = normalizedUserSentence.includes(normalizedCorrectWord);
     currentWord.userCorrect = containsWord;
-    
     if (containsWord) {
         this.speakingSession.score++;
         await this.recordPractice(currentWord.id, true);
