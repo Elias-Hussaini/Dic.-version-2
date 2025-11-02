@@ -1161,37 +1161,6 @@ skipListeningExercise() {
     this.showListeningExercise();
 }
 
-async checkListeningAnswer() {
-    const userAnswer = document.getElementById('listening-answer').value.trim();
-    const currentWord = this.listeningSession.words[this.listeningSession.currentIndex];
-    
-    if (!userAnswer) {
-        this.showToast('لطفاً پاسخ خود را وارد کنید', 'warning');
-        return;
-    }
-
-    this.listeningSession.attempts++;
-    const isCorrect = userAnswer.toLowerCase() === currentWord.german.toLowerCase();
-    
-    // ذخیره نتیجه برای نمایش در نمودار پیشرفت
-    currentWord.userCorrect = isCorrect;
-    
-    if (isCorrect) {
-        this.listeningSession.score++;
-        await this.recordPractice(currentWord.id, true);
-        this.showExerciseFeedback('✅ پاسخ صحیح! آفرین', 'correct');
-    } else {
-        await this.recordPractice(currentWord.id, false);
-        this.showExerciseFeedback(`❌ پاسخ صحیح: ${currentWord.german}`, 'incorrect');
-    }
-
-    // رفتن به سوال بعدی بعد از 2 ثانیه
-    setTimeout(() => {
-        this.listeningSession.currentIndex++;
-        this.showListeningExercise();
-    }, 2000);
-}
-
 skipListeningExercise() {
     this.listeningSession.currentIndex++;
     this.showListeningExercise();
@@ -1392,31 +1361,6 @@ async checkWritingAnswer() {
         this.writingSession.currentIndex++;
         this.showWritingExercise();
     }, 1200);
-}
-async checkWritingAnswer() {
-    const userAnswer = document.getElementById('writing-answer').value.trim();
-    const currentWord = this.writingSession.words[this.writingSession.currentIndex];
-    
-    if (!userAnswer) {
-        this.showToast('لطفاً پاسخ خود را وارد کنید', 'warning');
-        return;
-    }
-const isCorrect = selectedAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
-    currentWord.userCorrect = isCorrect;
-    
-    if (isCorrect) {
-        this.writingSession.score++;
-        await this.recordPractice(currentWord.id, true);
-        this.showExerciseFeedback('✅ تبریک! درست تایپ کردید', 'correct');
-    } else {
-        await this.recordPractice(currentWord.id, false);
-        this.showExerciseFeedback(`❌ صحیح: ${currentWord.german}`, 'incorrect');
-    }
-
-    setTimeout(() => {
-        this.writingSession.currentIndex++;
-        this.showWritingExercise();
-    }, 2000);
 }
 
 showWritingHint() {
@@ -1704,33 +1648,7 @@ async checkSentenceAnswer() {
         this.showSpeakingExercise();
     }, 1200);
 }
-async checkSentenceAnswer() {
-    const userSentence = document.getElementById('sentence-answer').value.trim();
-    const currentWord = this.speakingSession.words[this.speakingSession.currentIndex];
-    
-    if (!userSentence) {
-        this.showToast('لطفاً جمله خود را بنویسید', 'warning');
-        return;
-    }
 
-    // بررسی ساده - فقط وجود لغت در جمله
-    const containsWord = userSentence.toLowerCase().includes(currentWord.german.toLowerCase());
-    currentWord.userCorrect = containsWord;
-    
-    if (containsWord) {
-        this.speakingSession.score++;
-        await this.recordPractice(currentWord.id, true);
-        this.showExerciseFeedback('✅ جمله شما صحیح است! آفرین', 'correct');
-    } else {
-        await this.recordPractice(currentWord.id, false);
-        this.showExerciseFeedback('❌ لغت در جمله استفاده نشده است', 'incorrect');
-    }
-
-    setTimeout(() => {
-        this.speakingSession.currentIndex++;
-        this.showSpeakingExercise();
-    }, 3000);
-}
 
 showSentenceExample() {
     const currentWord = this.speakingSession.words[this.speakingSession.currentIndex];
@@ -2741,7 +2659,7 @@ async startQuiz(wordIds = null, range = null) {
           const selectedAnswer = question.options[selectedIndex];
           
           question.userAnswer = selectedAnswer;
-          question.isCorrect = selectedAnswer === question.correctAnswer;
+          question.isCorrect = selectedAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
           
           if (question.isCorrect) {
             this.quizSession.score++;
@@ -4260,4 +4178,5 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById(`${sectionId}-section`).classList.add('active');
   }
 });
+
 
