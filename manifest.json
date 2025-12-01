@@ -1,6 +1,6 @@
 {
   "name": " DE.Dictionary ",
-  "short_name": "دیکشنری",
+  "short_name": "DE.Dictionary",
   "description": "دیکشنری پیشرفته آلمانی به فارسی با قابلیت ذخیره لغات، تمرین و آزمون",
   "start_url": "./",
   "display": "standalone",

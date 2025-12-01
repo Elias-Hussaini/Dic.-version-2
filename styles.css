@@ -4335,11 +4335,1173 @@ body.spacious-layout .word-title {
         font-size: 13px;
     }
 }
+/* استایل‌های بخش ترجمه */
+.translate-direction {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.direction-btn {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.direction-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.direction-btn:hover:not(.active) {
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+.translate-result {
+    min-height: 150px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #f8f9fa;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.translate-result:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.empty-result {
+    text-align: center;
+    color: #999;
+    padding: 40px 0;
+}
+
+.empty-result i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-result p {
+    font-size: 14px;
+}
+
+.translate-features {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.feature-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.feature-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.feature-btn i {
+    color: #667eea;
+}
+
+/* حالت دارک مود */
+.dark-mode .translate-result {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+
+.dark-mode .direction-btn {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+
+.dark-mode .direction-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.dark-mode .feature-btn {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .translate-direction {
+        flex-direction: column;
+    }
+    
+    .translate-features {
+        flex-wrap: wrap;
+    }
+    
+    .feature {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+/* CSS اضافی برای بخش ترجمه */
+.loading-translation {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.translated-text {
+    text-align: center;
+}
+
+.original-text, .result-text {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background: white;
+}
+
+.original-text {
+    background: #f8f9fa;
+    border-right: 3px solid #667eea;
+}
+
+.result-text {
+    background: #e8f5e8;
+    border-right: 3px solid #4CAF50;
+}
+
+.original-text small, .result-text small {
+    display: block;
+    color: #666;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.original-text p, .result-text p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.separator {
+    margin: 10px 0;
+    color: #667eea;
+}
+
+.error-message {
+    text-align: center;
+    padding: 30px 0;
+    color: #e74c3c;
+}
+
+.error-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* حالت دارک مود */
+.dark-mode .original-text {
+    background: #333;
+}
+
+.dark-mode .result-text {
+    background: #2d4d2d;
+}
+
+.dark-mode .spinner {
+    border-color: #444;
+    border-top-color: #667eea;
+}
+
+/* استایل‌های اضافی برای بخش ترجمه */
+.translate-result[contenteditable="true"] {
+    min-height: 150px;
+    outline: none;
+}
+
+.translate-result[contenteditable="true"]:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* انیمیشن برای دکمه ترجمه */
+#translate-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+#translate-btn:active {
+    transform: scale(0.98);
+}
+
+#translate-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+#translate-btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+
+
+}
+/* استایل ترجمه اتوماتیک */
+#translate-input {
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#translate-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.translate-suggestions {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.suggestion-item:hover {
+    background: #e9ecef;
+    transform: translateX(-5px);
+}
+
+.suggestion-german {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.suggestion-persian {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* حالت دارک مود */
+.dark-mode .suggestion-item {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .suggestion-item:hover {
+    background: #3a3a3a;
+}
+
+.dark-mode .suggestion-german {
+    color: #ecf0f1;
+}
+
+.dark-mode .suggestion-persian {
+    color: #bdc3c7;
+}
+/* پیام‌های جدید */
+.not-found-message {
+    text-align: center;
+    padding: 30px 0;
+    color: #e67e22;
+}
+
+.not-found-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.not-found-message p {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.not-found-message small {
+    font-size: 13px;
+    color: #95a5a6;
+}
+
+.word-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.word-details small {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* حالت دارک مود */
+.dark-mode .not-found-message {
+    color: #f39c12;
+}
+
+.dark-mode .word-details {
+    border-top-color: #444;
+}
+/* استایل‌های زیباتر برای مترجم */
+.direction-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.direction-option {
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.direction-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: #667eea;
+}
+
+.direction-option.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.direction-option.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    opacity: 0.05;
+    z-index: 0;
+}
+
+.direction-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.direction-text {
+    flex: 1;
+    z-index: 1;
+}
+
+.direction-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.direction-subtitle {
+    font-size: 13px;
+    color: #7f8c8d;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.direction-option.active .direction-title {
+    color: #667eea;
+}
+
+.direction-check {
+    color: #667eea;
+    font-size: 18px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.direction-option.active .direction-check {
+    opacity: 1;
+}
+
+/* فیلد ورودی با دکمه پاک کردن */
+.input-with-clear {
+    position: relative;
+}
+
+.clear-input {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    background: rgba(0,0,0,0.1);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.clear-input:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    transform: scale(1.1);
+}
+
+.form-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+/* نتیجه ترجمه زیباتر */
+.translate-result {
+    min-height: 120px;
+    padding: 25px;
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
+    background: white;
+    font-size: 17px;
+    line-height: 1.8;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.translate-result:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.empty-result {
+    text-align: center;
+    color: #95a5a6;
+    padding: 30px 0;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.4;
+}
+
+.empty-result p {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #7f8c8d;
+}
+
+.empty-result small {
+    font-size: 13px;
+    color: #bdc3c7;
+}
+
+/* دکمه‌های عملیات */
+.translate-actions {
+    margin: 30px 0;
+}
+
+.action-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.voice-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.voice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(155, 89, 182, 0.3);
+}
+
+/* پیشنهادات زیباتر */
+.translate-suggestions {
+    margin-top: 25px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.suggestions-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.suggestions-header i {
+    color: #f39c12;
+}
+
+.suggestions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.suggestion-item {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestion-item:hover {
+    background: #e9ecef;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border-color: #667eea;
+}
+
+.suggestion-item:hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: #667eea;
+}
+
+.suggestion-german {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.suggestion-persian {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.suggestion-details {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* حالت دارک مود */
+.dark-mode .direction-option {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .direction-option:hover {
+    border-color: #667eea;
+}
+
+.dark-mode .direction-option.active {
+    background: rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+
+.dark-mode .direction-title {
+    color: #ecf0f1;
+}
+
+.dark-mode .direction-subtitle {
+    color: #bdc3c7;
+}
+
+.dark-mode .translate-result {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #ecf0f1;
+}
+
+.dark-mode .suggestion-item {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .suggestion-item:hover {
+    background: #3a3a3a;
+}
+
+.dark-mode .suggestion-german {
+    color: #ecf0f1;
+}
+
+.dark-mode .suggestion-persian {
+    color: #bdc3c7;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .direction-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-group {
+        flex-direction: column;
+    }
+    
+    .suggestions-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .direction-option {
+        padding: 15px;
+    }
+    
+    .direction-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
 
 
 
+/* استایل برای بخش ترجمه */
+.direction-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
+.direction-option {
+    flex: 1;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
+.direction-option.active {
+    border-color: #3498db;
+    background-color: #f0f8ff;
+}
 
+.direction-icon {
+    font-size: 24px;
+    color: #3498db;
+}
 
+.direction-text {
+    flex: 1;
+}
 
+.direction-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.direction-subtitle {
+    font-size: 14px;
+    color: #666;
+}
+
+.direction-check {
+    color: #3498db;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.direction-option.active .direction-check {
+    opacity: 1;
+}
+
+.input-with-clear {
+    position: relative;
+}
+
+.clear-input {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.clear-input:hover {
+    color: #e74c3c;
+}
+
+.translate-result {
+    min-height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f9f9f9;
+}
+
+.empty-result {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: #ddd;
+    margin-bottom: 10px;
+}
+
+.translate-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.action-group {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.voice-btn {
+    background-color: #f0f8ff;
+    color: #3498db;
+}
+
+.copy-btn {
+    background-color: #fff0f0;
+    color: #e74c3c;
+}
+
+.save-btn {
+    background-color: #f0fff0;
+    color: #27ae60;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.translate-suggestions {
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.suggestions-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.suggestion-item {
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f8ff;
+    border-color: #3498db;
+}
+
+.suggestion-german {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.suggestion-persian {
+    color: #666;
+    font-size: 14px;
+}
+/* استایل‌های جدید برای ترجمه آنلاین */
+.loading-translation {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+}
+
+.loading-translation .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.translated-text {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.original-text {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-right: 3px solid #e9ecef;
+}
+
+.separator {
+    text-align: center;
+    color: #3498db;
+    margin: 10px 0;
+    font-size: 20px;
+}
+
+.translation-success {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    color: #27ae60;
+    font-size: 14px;
+}
+
+.save-suggestion {
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.not-found-message, .error-message {
+    text-align: center;
+    padding: 30px;
+    color: #e74c3c;
+}
+
+.not-found-message i, .error-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #e74c3c;
+}
+
+/* استایل برای وضعیت آنلاین/آفلاین */
+.online-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.online-status.online {
+    color: #27ae60;
+}
+
+.online-status.offline {
+    color: #e74c3c;
+}
+/* رفع تداخل استایل‌های مترجم */
+.translate-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.action-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.voice-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* استایل پیشنهادات */
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    border-color: #3498db;
+    background: #f8f9fa;
+}
+
+.suggestion-content {
+    flex: 1;
+}
+
+.suggestion-german {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.suggestion-persian {
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.word-gender-badge, .word-type-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-right: 5px;
+}
+
+.word-gender-badge.masculine { background: #3498db; color: white; }
+.word-gender-badge.feminine { background: #e74c3c; color: white; }
+.word-gender-badge.neuter { background: #2ecc71; color: white; }
+.word-type-badge { background: #f39c12; color: white; }
+
+.no-suggestions {
+    text-align: center;
+    padding: 15px;
+    color: #95a5a6;
+    font-size: 14px;
+}
+
+/* رفع تداخل استایل‌های فرم */
+.verb-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .verb-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-group {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+}
+
+/* پاکسازی استایل‌های قدیمی */
+.translate-result {
+    all: initial;
+    min-height: 120px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    display: block;
+}

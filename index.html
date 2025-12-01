@@ -192,6 +192,10 @@
                 <i class="fas fa-plus-circle"></i>
                 <span>اضافه کردن لغت</span>
             </div>
+            <div class="menu-item" data-section="translate">
+    <i class="fas fa-language"></i>
+    <span>ترجمه</span>
+</div>
             <div class="menu-item" data-section="favorites">
                 <i class="fas fa-star"></i>
                 <span>علاقه‌مندی‌ها</span>
@@ -224,56 +228,30 @@
 
         <!-- محتوای اصلی -->
         <div class="main-content">
-            <!-- بخش جستجو -->
-            <div id="search-section" class="content-section active">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="لغت آلمانی یا فارسی را جستجو کنید...">
-                    <button id="search-btn"><i class="fas fa-search"></i></button>
-                </div>
+           <!-- بخش جستجو -->
+<div id="search-section" class="content-section active">
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="لغت آلمانی یا فارسی را جستجو کنید...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+    </div>
 
-                <div class="word-card">
-                    <div class="word-header">
-                        <div>
-                            <span class="word-title">Haus</span>
-                            <span class="word-gender neuter">das (خنثی)</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-star favorite-icon" data-word="Haus"></i>
-                            <i class="fas fa-volume-up pronunciation-icon" data-word="Haus"></i>
-                        </div>
-                    </div>
-                    <div class="word-meaning">
-                        <p><strong>معنی:</strong> خانه، منزل</p>
-                    </div>
-                    
-                    <div class="tab-container">
-                        <div class="tab active" data-tab="examples">مثال‌ها</div>
-                        <div class="tab" data-tab="conjugation">صرف فعل</div>
-                        <div class="tab" data-tab="synonyms">مترادف‌ها</div>
-                        <div class="tab" data-tab="antonyms">متضاد‌ها</div>
-                        <div class="tab" data-tab="usage">کاربردها</div>
-                    </div>
-                    
-                    <div class="tab-content" id="examples-content">
-                        <div class="example">
-                            <p><strong>مثال:</strong> Ich gehe nach Hause. (من به خانه می‌روم.)</p>
-                            <p><strong>ترجمه:</strong> I'm going home.</p>
-                        </div>
-                        <div class="example">
-                            <p><strong>مثال:</strong> Das ist mein Haus. (این خانه من است.)</p>
-                            <p><strong>ترجمه:</strong> This is my house.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-primary">افزودن مثال جدید</button>
-                        <button class="btn btn-outline">تمرین این لغت</button>
-                    </div>
-                        <button class="btn btn-primary" id="fullscreen-toggle" onclick="toggleFullscreen()">
-            <i class="fas fa-expand"></i> فول اسکرین
-        </button>
-                </div>
-            </div>
+    <div class="word-card">
+        <h3 class="text-center" style="color: #4361ee; margin-bottom: 20px;">
+            <i class="fas fa-expand"></i> برای تجربه بهتر
+        </h3>
+        
+        <div class="text-center" style="padding: 20px;">
+            <p style="margin-bottom: 20px; color: #666;">
+                برای استفاده بهتر از برنامه، وارد حالت فول‌اسکرین شوید
+            </p>
+            
+            <button class="btn btn-primary" id="fullscreen-toggle" onclick="toggleFullscreen()" 
+                    style="padding: 15px 30px; font-size: 16px;">
+                <i class="fas fa-expand"></i> ورود به حالت فول‌اسکرین
+            </button>
+        </div>
+    </div>
+</div>
 
             <!-- بخش اضافه کردن لغت -->
             <div id="add-word-section" class="content-section">
@@ -325,7 +303,121 @@
                     <button id="save-word-btn" class="btn btn-primary">ذخیره لغت</button>
                 </div>
             </div>
+      <div id="translate-section" class="content-section">
+    <div class="word-card">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-language"></i>
+            مترجم آلمانی ↔ فارسی
+        </h2>
+        
+        <!-- انتخاب جهت ترجمه با طراحی زیباتر -->
+        <div class="form-group">
+            <label class="form-label">انتخاب جهت ترجمه:</label>
+            <div class="direction-selector">
+                <div class="direction-option active" data-direction="de-fa">
+                    <div class="direction-icon">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="direction-text">
+                        <div class="direction-title">آلمانی به فارسی</div>
+                        <div class="direction-subtitle">Deutsch → فارسی</div>
+                    </div>
+                    <div class="direction-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+                
+                <div class="direction-option" data-direction="fa-de">
+                    <div class="direction-icon">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <div class="direction-text">
+                        <div class="direction-title">فارسی به آلمانی</div>
+                        <div class="direction-subtitle">فارسی → Deutsch</div>
+                    </div>
+                    <div class="direction-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- فیلد ورودی -->
+        <div class="form-group">
+            <label id="input-label" for="translate-input">
+                <i class="fas fa-keyboard"></i>
+                <span id="input-title">متن آلمانی:</span>
+            </label>
+            <div class="input-with-clear">
+                <textarea 
+                    id="translate-input" 
+                    class="form-control" 
+                    rows="3" 
+                    placeholder="متن خود را وارد کنید..."
+                    dir="ltr"
+                    autofocus></textarea>
+                <button class="clear-input" id="clear-input">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <small id="input-hint" class="form-text text-muted">
+                <i class="fas fa-info-circle"></i>
+                ترجمه به صورت خودکار انجام می‌شود
+            </small>
+        </div>
+
+        <!-- نتیجه ترجمه -->
+        <div class="form-group">
+            <label id="output-label">
+                <i class="fas fa-language"></i>
+                <span id="output-title">ترجمه فارسی:</span>
+            </label>
+            <div id="translate-result" class="translate-result">
+                <div class="empty-result">
+                    <div class="empty-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <p>نتیجه ترجمه اینجا نمایش داده می‌شود</p>
+                    <small>متن را در باکس بالا وارد کنید</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- دکمه‌های عملیات -->
+        <div class="translate-actions">
+            <div class="action-group">
+                <button class="action-btn voice-btn" id="speak-input">
+                    <i class="fas fa-volume-up"></i>
+                    <span>تلفظ متن</span>
+                </button>
+                <button class="action-btn voice-btn" id="speak-output">
+                    <i class="fas fa-volume-up"></i>
+                    <span>تلفظ ترجمه</span>
+                </button>
+            </div>
+            
+            <div class="action-group">
+                <button class="action-btn copy-btn" id="copy-result">
+                    <i class="fas fa-copy"></i>
+                    <span>کپی ترجمه</span>
+                </button>
+                <button class="action-btn save-btn" id="save-translation">
+                    <i class="fas fa-save"></i>
+                    <span>ذخیره در دیکشنری</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- جستجوی پیشنهادی -->
+        <div id="translate-suggestions" class="translate-suggestions">
+            <div class="suggestions-header">
+                <i class="fas fa-lightbulb"></i>
+                <span>پیشنهادات مشابه</span>
+            </div>
+            <div class="suggestions-list" id="suggestions-list"></div>
+        </div>
+    </div>
+</div>
             <!-- سایر بخش‌ها -->
             <div id="favorites-section" class="content-section">
                 <h2>لغات مورد علاقه</h2>
@@ -524,6 +616,10 @@ document.addEventListener('DOMContentLoaded', function() {
     <i class="fas fa-plus-circle"></i>
     <span>اضافه کردن لغت</span>
   </div>
+  <div class="mobile-menu-item" data-section="translate">
+    <i class="fas fa-language"></i>
+    <span>ترجمه</span>
+</div>
   <div class="mobile-menu-item" data-section="favorites">
     <i class="fas fa-star"></i>
     <span>علاقه‌مندی‌ها</span>

@@ -514,25 +514,3 @@ function isWordInFavorites(word) {
   const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
   return favorites.includes(word);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
