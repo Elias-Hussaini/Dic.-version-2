@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    
     <!-- لینک مانیفست و تنظیمات PWA -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#4361ee">
@@ -195,6 +196,11 @@
             <div class="menu-item" data-section="translate">
     <i class="fas fa-language"></i>
     <span>ترجمه</span>
+</div>
+<!-- بعد از آیتم ترجمه -->
+<div class="menu-item" data-section="ai-chat">
+    <i class="fas fa-robot"></i>
+    <span> AI</span>
 </div>
             <div class="menu-item" data-section="favorites">
                 <i class="fas fa-star"></i>
@@ -418,6 +424,382 @@
         </div>
     </div>
 </div>
+<!-- در فایل HTML اصلی، بخش ai-chat-section را با این کد جایگزین کنید: -->
+<div id="ai-chat-section" class="content-section">
+    <div class="ai-chat-container">
+        <!-- هدر اصلی با همه دکمه‌ها -->
+        <div class="ai-chat-header">
+            <div class="header-left">
+                <div class="ai-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="header-info">
+                    <h3 class="ai-title">دستیار هوش مصنوعی آلمانی</h3>
+                    <p class="ai-subtitle">آموزش گرامر، واژگان و مکالمه آلمانی</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <!-- دکمه تنظیمات صدا -->
+                <button class="header-btn voice-settings-btn" id="voice-settings-btn" title="تنظیمات صدا">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                
+                <!-- دکمه تغییر تم -->
+                <button class="header-btn theme-toggle-btn" id="ai-theme-toggle" title="تغییر تم">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <!-- دکمه چت جدید -->
+                <button class="header-btn new-chat-btn" id="new-chat-btn" title="چت جدید">
+                    <i class="fas fa-plus"></i>
+                </button>
+                
+                <!-- دکمه پاک کردن تاریخچه -->
+                <button class="header-btn delete-btn" id="clear-chat-history" title="پاک کردن چت">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- بخش اصلی چت -->
+        <div class="ai-chat-main">
+            <!-- تاریخچه چت -->
+            <div class="chat-messages-container" id="chat-history">
+                <div class="welcome-message">
+                    <div class="message ai-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                <h4>👋 سلام! من دستیار هوش مصنوعی شما هستم</h4>
+                                <p>می‌توانید هر سوالی درباره زبان آلمانی از من بپرسید:</p>
+                                
+                                <div class="features-grid">
+                                    <div class="feature-item">
+                                        <i class="fas fa-language"></i>
+                                        <span>گرامر و دستور زبان</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-book"></i>
+                                        <span>واژگان و لغات جدید</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-comments"></i>
+                                        <span>جمله‌سازی و مکالمه</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-volume-up"></i>
+                                        <span>تلفظ و لهجه‌گیری</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-pen"></i>
+                                        <span>تمرین و تست</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>راهنمایی یادگیری</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="welcome-tip">
+                                    <i class="fas fa-info-circle"></i>
+                                    از دکمه‌های پایین برای سوالات سریع یا گفتگوی صوتی استفاده کنید
+                                </div>
+                            </div>
+                            <div class="message-time">همین الان</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- پیشنهادات سریع با دکمه‌های صوتی -->
+            <div class="quick-actions-section">
+                <div class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    <span>سوالات سریع</span>
+                </div>
+                
+                <div class="quick-actions-grid">
+                    <button class="quick-action-btn" data-question="چگونه افعال آلمانی را صرف کنم؟">
+                        <div class="action-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div class="action-text">
+                            <span>صرف فعل</span>
+                            <small>آموزش کامل</small>
+                        </div>
+                        <button class="voice-action-btn" data-question="چگونه افعال آلمانی را صرف کنم؟">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </button>
+                    
+                    <button class="quick-action-btn" data-question="تفاوت der, die, das چیست؟">
+                        <div class="action-icon">
+                            <i class="fas fa-venus-mars"></i>
+                        </div>
+                        <div class="action-text">
+                            <span>جنسیت اسم‌ها</span>
+                            <small>der, die, das</small>
+                        </div>
+                        <button class="voice-action-btn" data-question="تفاوت der, die, das چیست؟">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </button>
+                    
+                    <button class="quick-action-btn" data-question="جمله‌سازی آلمانی آموزش بده">
+                        <div class="action-icon">
+                            <i class="fas fa-comment-alt"></i>
+                        </div>
+                        <div class="action-text">
+                            <span>جمله‌سازی</span>
+                            <small>آموزش قدم به قدم</small>
+                        </div>
+                        <button class="voice-action-btn" data-question="جمله‌سازی آلمانی آموزش بده">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </button>
+                    
+                    <button class="quick-action-btn" data-question="تلفظ صحیح کلمات آلمانی">
+                        <div class="action-icon">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="action-text">
+                            <span>تلفظ</span>
+                            <small>لهجه آلمانی</small>
+                        </div>
+                        <button class="voice-action-btn" data-question="تلفظ صحیح کلمات آلمانی">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </button>
+                </div>
+            </div>
+
+            <!-- بخش ورودی - با همه دکمه‌های صوتی -->
+            <div class="chat-input-section">
+                <!-- انتخاب مدل -->
+                <div class="model-selection-row">
+                    <div class="model-label">
+                        <i class="fas fa-brain"></i>
+                        <span>مدل هوش مصنوعی:</span>
+                    </div>
+                    <div class="model-select-wrapper">
+                        <select id="ai-model-select" class="model-select">
+                            <option value="deepseek-chat">🤖 DeepSeek Chat</option>
+                            <option value="gpt-3.5-turbo">⚡ GPT-3.5 Turbo</option>
+                            <option value="gpt-4">🚀 GPT-4</option>
+                            <option value="claude-3-haiku">🎭 Claude 3 Haiku</option>
+                            <option value="llama-3.1">🦙 Llama 3.1</option>
+                        </select>
+                        <div class="model-info-icon" title="اطلاعات مدل">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                    </div>
+                    <div class="model-status">
+                        <span class="status-indicator online"></span>
+                        <span class="status-text">آنلاین</span>
+                    </div>
+                </div>
+
+                <!-- دکمه‌های کنترل صدا -->
+                <div class="voice-controls-row">
+                    <div class="voice-controls-label">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span>کنترل‌های صوتی:</span>
+                    </div>
+                    <div class="voice-controls-buttons">
+                        <button class="voice-control-btn" id="start-voice-chat" title="شروع گفتگوی صوتی">
+                            <i class="fas fa-microphone"></i>
+                            <span>شروع گفتگو</span>
+                        </button>
+                        <button class="voice-control-btn" id="stop-voice-chat" title="توقف گفتگوی صوتی" disabled>
+                            <i class="fas fa-stop-circle"></i>
+                            <span>توقف</span>
+                        </button>
+                        <button class="voice-control-btn" id="play-response" title="پخش پاسخ">
+                            <i class="fas fa-play-circle"></i>
+                            <span>پخش پاسخ</span>
+                        </button>
+                        <button class="voice-control-btn" id="voice-settings" title="تنظیمات صدا">
+                            <i class="fas fa-cog"></i>
+                            <span>تنظیمات</span>
+                        </button>
+                    </div>
+                    <div class="voice-status">
+                        <div class="voice-level-indicator">
+                            <div class="level-bar"></div>
+                            <div class="level-bar"></div>
+                            <div class="level-bar"></div>
+                            <div class="level-bar"></div>
+                            <div class="level-bar"></div>
+                        </div>
+                        <span class="status-text">آماده</span>
+                    </div>
+                </div>
+
+                <!-- ورودی متن اصلی -->
+                <div class="main-input-area">
+                    <div class="input-wrapper">
+                        <div class="input-actions-left">
+                            <button class="input-action-btn" id="attach-file-btn" title="افزودن فایل">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button class="input-action-btn" id="emoji-btn" title="ایموجی">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <button class="input-action-btn voice-input-btn" id="voice-input-toggle" title="ورودی صوتی">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                        
+                        <textarea 
+                            id="ai-chat-input" 
+                            class="chat-input-textarea" 
+                           
+                            rows="3"
+                            autocomplete="off"
+                            spellcheck="false"
+                        ></textarea>
+                        
+                        <div class="input-actions-right">
+                            <button class="input-action-btn" id="clear-input-btn" title="پاک کردن متن">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="send-message-btn" id="send-ai-message" title="ارسال پیام">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>ارسال</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- نمایش وضعیت ورودی صوتی -->
+                    <div class="voice-input-status" id="voice-input-status" style="display: none;">
+                        <div class="voice-status-content">
+                            <div class="voice-pulse-animation">
+                                <div class="pulse-circle"></div>
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div class="voice-status-text">
+                                <span class="status-message">در حال گوش دادن... صحبت کنید</span>
+                                <span class="timer">00:00</span>
+                            </div>
+                            <button class="stop-voice-btn" id="stop-voice-input">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                        </div>
+                        <div class="voice-waveform">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- راهنمایی‌های پایین -->
+                    <div class="input-hints">
+                        <div class="hint-item">
+                            <i class="fas fa-keyboard"></i>
+                            <span>می‌توانید متن را تایپ کنید</span>
+                        </div>
+                        <div class="hint-item">
+                            <i class="fas fa-microphone"></i>
+                            <span>یا از گفتگوی صوتی استفاده کنید</span>
+                        </div>
+                        <div class="hint-item">
+                            <i class="fas fa-volume-up"></i>
+                            <span>پاسخ‌ها قابل پخش صوتی هستند</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- پنل تنظیمات صوتی (مخفی) -->
+        <div class="voice-settings-panel" id="voice-settings-panel" style="display: none;">
+            <div class="settings-header">
+                <h4><i class="fas fa-cog"></i> تنظیمات صوتی</h4>
+                <button class="close-settings-btn" id="close-voice-settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="settings-content">
+                <div class="setting-item">
+                    <label for="voice-speed">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>سرعت گفتار:</span>
+                    </label>
+                    <input type="range" id="voice-speed" min="0.5" max="2" step="0.1" value="1">
+                    <span class="value-display" id="speed-value">1.0x</span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="voice-pitch">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>زیر و بمی صدا:</span>
+                    </label>
+                    <input type="range" id="voice-pitch" min="0.5" max="2" step="0.1" value="1">
+                    <span class="value-display" id="pitch-value">1.0</span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="voice-volume">
+                        <i class="fas fa-volume-up"></i>
+                        <span>بلندی صدا:</span>
+                    </label>
+                    <input type="range" id="voice-volume" min="0" max="1" step="0.1" value="0.8">
+                    <span class="value-display" id="volume-value">80%</span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="voice-language">
+                        <i class="fas fa-globe"></i>
+                        <span>زبان گفتار:</span>
+                    </label>
+                    <select id="voice-language">
+                        <option value="de-DE">آلمانی (آلمان)</option>
+                        <option value="de-AT">آلمانی (اتریش)</option>
+                        <option value="de-CH">آلمانی (سوئیس)</option>
+                        <option value="en-US">انگلیسی (آمریکا)</option>
+                        <option value="fa-IR">فارسی (ایران)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label>
+                        <i class="fas fa-robot"></i>
+                        <span>صدای پاسخ‌ها:</span>
+                    </label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="auto-play-response" checked>
+                        <label for="auto-play-response" class="toggle-slider"></label>
+                        <span class="toggle-label">پخش خودکار پاسخ‌ها</span>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="settings-btn save-btn" id="save-voice-settings">
+                        <i class="fas fa-save"></i>
+                        ذخیره تنظیمات
+                    </button>
+                    <button class="settings-btn test-btn" id="test-voice-settings">
+                        <i class="fas fa-play"></i>
+                        تست صدا
+                    </button>
+                    <button class="settings-btn reset-btn" id="reset-voice-settings">
+                        <i class="fas fa-redo"></i>
+                        بازنشانی
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             <!-- سایر بخش‌ها -->
             <div id="favorites-section" class="content-section">
                 <h2>لغات مورد علاقه</h2>
@@ -599,6 +981,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="./sw.js"></script>
     <script src="./install.js"></script>
     <script src="./responsive.js"></script>
+    <script src="./ai-fixes.js"></script>
 
 
 
@@ -619,6 +1002,11 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="mobile-menu-item" data-section="translate">
     <i class="fas fa-language"></i>
     <span>ترجمه</span>
+</div>
+<!-- بعد از آیتم ترجمه -->
+<div class="mobile-menu-item" data-section="ai-chat">
+    <i class="fas fa-robot"></i>
+    <span> AI</span>
 </div>
   <div class="mobile-menu-item" data-section="favorites">
     <i class="fas fa-star"></i>
