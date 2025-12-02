@@ -204,38 +204,35 @@ handleScroll() {
         this.scrollState.isUserScrolling = false;
     }, 1500);
 }
-
-// متد بهبود یافته برای اضافه کردن پیام
 async addMessageToHistory(sender, message) {
-  const chatHistory = document.getElementById('chat-history');
-  if (!chatHistory) return;
-  
-  const messageId = `message-${Date.now()}`;
-  const time = new Date().toLocaleTimeString('fa-IR', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-  
-  const safeMessage = this.escapeHtml(message);
-  const formattedMessage = this.formatMessage(safeMessage);
-  
-  const messageHtml = `
-    <div class="ai-message ${sender}-message" id="${messageId}">
-      <div class="message-content">
-        <div class="message-text">${formattedMessage}</div>
-        <div class="message-time">${time}</div>
-      </div>
-    </div>
-  `;
-  
-  chatHistory.insertAdjacentHTML('beforeend', messageHtml);
-  
-  // اگر کاربر در حال اسکرول نباشد، به پایین اسکرول کن
-  if (!this.scrollState.isUserScrolling || this.scrollState.isAtBottom) {
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 100);
-  }
+    const chatHistory = document.getElementById('chat-history');
+    if (!chatHistory) return;
+    
+    const messageId = `message-${Date.now()}`;
+    const time = new Date().toLocaleTimeString('fa-IR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    const safeMessage = this.escapeHtml(message);
+    const formattedMessage = this.formatMessage(safeMessage);
+    
+    // 🔴 بدون تایپ تدریجی - مستقیم نمایش بده
+    const messageHtml = `
+        <div class="ai-message ${sender}-message" id="${messageId}">
+            <div class="message-content">
+                <div class="message-text">${formattedMessage}</div>
+                <div class="message-time">${time}</div>
+            </div>
+        </div>
+    `;
+    
+    chatHistory.insertAdjacentHTML('beforeend', messageHtml);
+    
+    // اسکرول به پایین
+    this.scrollToBottom();
+    
+    return messageId;
 }
     
     checkScrollPosition(container) {
@@ -298,57 +295,94 @@ async addMessageToHistory(sender, message) {
         }
     }
     
-   async typeMessageGradually(text) {
-  const chatHistory = document.getElementById('chat-history');
-  if (!chatHistory) return;
-  
-  this.isAITyping = true;
-  
-  const messageId = `ai-${Date.now()}`;
-  const time = new Date().toLocaleTimeString('fa-IR', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
-  
-  // ایجاد عنصر پیام
-  const messageHtml = `
-    <div class="ai-message ai-response" id="${messageId}">
-      <div class="message-content">
-        <div class="message-text"></div>
-        <div class="message-time">${time}</div>
-      </div>
-    </div>
-  `;
-  
-  chatHistory.insertAdjacentHTML('beforeend', messageHtml);
-  
-  const messageElement = document.getElementById(messageId);
-  const textElement = messageElement.querySelector('.message-text');
-  
-  // تایپ تدریجی
-  let displayedText = '';
-  const words = text.split(' ');
-  let wordIndex = 0;
-  
-  return new Promise((resolve) => {
-    const typeInterval = setInterval(() => {
-      if (wordIndex < words.length) {
-        displayedText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
-        textElement.innerHTML = this.formatMessage(displayedText);
-        wordIndex++;
-        
-        // اسکرول فقط اگر کاربر در پایین است یا در حال اسکرول نیست
-        if (this.scrollState.isAtBottom || !this.scrollState.isUserScrolling) {
-          this.scrollToBottom();
+  async typeMessageGradually(text) {
+    const chatHistory = document.getElementById('chat-history');
+    if (!chatHistory) return;
+    
+    const messageId = `ai-${Date.now()}`;
+    const time = new Date().toLocaleTimeString('fa-IR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    const messageHtml = `
+        <div class="ai-message ai-response" id="${messageId}">
+            <div class="message-content">
+                <div class="message-text"></div>
+                <div class="message-time">${time}</div>
+            </div>
+        </div>
+    `;
+    
+    chatHistory.insertAdjacentHTML('beforeend', messageHtml);
+    
+    const messageElement = document.getElementById(messageId);
+    const textElement = messageElement.querySelector('.message-text');
+    
+    // 🔴 سرعت را 10 برابر کنید (از 50ms به 5ms)
+    const typingSpeed = 5; // میلی‌ثانیه
+    
+    // روش سریع: متن را بلوک‌های بزرگ‌تر نمایش بده
+    const words = text.split(' ');
+    let displayedText = '';
+    
+    return new Promise((resolve) => {
+        const typeInterval = setInterval(() => {
+            if (words.length > 0) {
+                // هر بار 3 کلمه نمایش بده
+                const chunkSize = Math.min(3, words.length);
+                const chunk = words.splice(0, chunkSize).join(' ');
+                displayedText += (displayedText ? ' ' : '') + chunk;
+                textElement.innerHTML = this.formatMessage(displayedText);
+                
+                // اسکرول
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } else {
+                clearInterval(typeInterval);
+                resolve();
+            }
+        }, typingSpeed);
+    });
+}
+async addMessageInstantly(sender, message) {
+    const chatHistory = document.getElementById('chat-history');
+    if (!chatHistory) return;
+    
+    const messageId = `message-${Date.now()}`;
+    const time = new Date().toLocaleTimeString('fa-IR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    const safeMessage = this.escapeHtml(message);
+    const formattedMessage = this.formatMessage(safeMessage);
+    
+    // نمایش بلافاصله اما با انیمیشن fade in
+    const messageHtml = `
+        <div class="ai-message ${sender}-message" id="${messageId}" style="opacity: 0; transform: translateY(10px);">
+            <div class="message-content">
+                <div class="message-text">${formattedMessage}</div>
+                <div class="message-time">${time}</div>
+            </div>
+        </div>
+    `;
+    
+    chatHistory.insertAdjacentHTML('beforeend', messageHtml);
+    
+    // انیمیشن fade in سریع
+    setTimeout(() => {
+        const element = document.getElementById(messageId);
+        if (element) {
+            element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
         }
-      } else {
-        clearInterval(typeInterval);
-        this.isAITyping = false;
-        this.scrollToBottom(); // یک بار دیگر اسکرول کن بعد از اتمام
-        resolve();
-      }
-    }, 50); // سرعت منطقی
-  });
+    }, 10);
+    
+    // اسکرول فوری
+    this.scrollToBottom();
+    
+    return messageId;
 }
 // در کلاس GermanDictionary در app.js، بخش AI Chat را به صورت زیر به‌روزرسانی کنید:
 
@@ -532,34 +566,18 @@ renderAIChat() {
                             <span>مدل هوش مصنوعی:</span>
                         </div>
                         <div class="model-select-wrapper">
-                            <select id="ai-model-select" class="model-select">
-            <!-- مدل‌های پیشرفته -->
-            <option value="claude-3.5-sonnet">🎭 Claude 3.5 Sonnet</option>
-            <option value="claude-3-opus">👑 Claude 3 Opus</option>
-            <option value="gpt-4o">⚡ GPT-4o</option>
-            <option value="gpt-4-turbo">🚀 GPT-4 Turbo</option>
-            <option value="gpt-5">🌟 GPT-5 (پیش‌بینی)</option>
-            
-            <!-- مدل‌های DeepSeek -->
-            <option value="deepseek-chat">🤖 DeepSeek Chat</option>
-            <option value="deepseek-v3.2-speciale">💎 DeepSeek-V3.2-Speciale</option>
-            <option value="deepseek-v3.2">🚀 DeepSeek-V3.2</option>
-            
-            <!-- مدل‌های گوگل -->
-            <option value="gemini-2.0-ultra">✨ Gemini 2.0 Ultra</option>
-            <option value="gemini-2.0-pro">🌟 Gemini 2.0 Pro</option>
-            
-            <!-- مدل‌های اوپن‌سورس -->
-            <option value="qwen-2.5-max">🦅 Qwen 2.5 Max</option>
-            <option value="llama-3.1-405b">🦙 Llama 3.1 405B</option>
-            
-            <!-- مدل تخصصی -->
-            <option value="intellect-3">🔬 INTELLECT-3</option>
-            
-            <!-- مدل سریع -->
-            <option value="claude-sonnet-4.5">⚡ Claude Sonnet 4.5</option>
-            <option value="gpt-3.5-turbo">⚡ GPT-3.5 Turbo</option>
-        </select>
+           <select id="ai-model-select" class="model-select">
+    <!-- مدل‌های DeepSeek -->
+    <option value="deepseek-chat" selected>🤖 DeepSeek Chat (گفتگو - پیشنهادی)</option>
+    <option value="deepseek-coder">💻 DeepSeek Coder (برنامه‌نویسی)</option>
+    <option value="deepseek-reasoner">🔍 DeepSeek Reasoner (استدلال)</option>
+    
+    <!-- GPT-3.5 Turbo -->
+    <option value="gpt-3.5-turbo">⚡ GPT-3.5 Turbo (سریع و پایدار)</option>
+    
+    <!-- GPT-4 (اگر حساب شارژ باشد) -->
+    <option value="gpt-4o">🚀 GPT-4o (پیشرفته)</option>
+</select>
                             <div class="model-info-icon" title="اطلاعات مدل">
                                 <i class="fas fa-info-circle"></i>
                             </div>
@@ -1205,234 +1223,135 @@ resetVoiceSettings() {
 }
 
 
-
- async sendAIMessage() {
-        console.log('🚀 شروع ارسال پیام AI...');
-        
-        const input = document.getElementById('ai-chat-input');
-        const sendBtn = document.getElementById('send-ai-message');
-        
-        if (!input || !sendBtn) {
-            console.error('❌ المان‌های ورودی یافت نشدند');
-            return;
-        }
-        
-        const message = input.value.trim();
-        
-        if (!message) {
-            this.showToast('لطفاً پیام خود را وارد کنید', 'warning');
-            return;
-        }
-        
-        console.log('📝 متن پیام:', message);
-        
-        // غیرفعال کردن دکمه ارسال
-        sendBtn.disabled = true;
-        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        
-        // پاک کردن ورودی
-        input.value = '';
-        input.style.height = 'auto';
-         this.autoSaveChat();
-         await this.addMessageToHistory('user', message);
-        
-        // اضافه کردن پیام کاربر با مدیریت اسکرول
-        await this.addMessageWithScrollManagement('user', message);
-        
-        // نمایش وضعیت "در حال پردازش"
+async sendAIMessage() {
+    console.log('🚀 شروع ارسال پیام AI...');
+    
+    const input = document.getElementById('ai-chat-input');
+    const sendBtn = document.getElementById('send-ai-message');
+    
+    if (!input || !sendBtn) {
+        console.error('❌ المان‌های ورودی یافت نشدند');
+        return;
+    }
+    
+    const message = input.value.trim();
+    
+    if (!message) {
+        this.showToast('لطفاً پیام خود را وارد کنید', 'warning');
+        return;
+    }
+    
+    console.log('📝 متن پیام:', message);
+    
+    // غیرفعال کردن دکمه ارسال
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    // پاک کردن ورودی
+    input.value = '';
+    input.style.height = 'auto';
+    
+    // اضافه کردن پیام کاربر
+    this.addMessageToHistory('user', message);
+    
+    try {
+        // نمایش نشانگر تایپ
         this.showTypingIndicator();
         
-        try {
-            // دریافت پاسخ از API
-            console.log('🌐 درخواست به API...');
-            const response = await this.getAIResponse(message);
-            console.log('✅ دریافت پاسخ از API');
-            
-            // حذف نشانگر تایپ
-            this.removeTypingIndicator();
-            
-            // نمایش پاسخ با تایپ تدریجی و مدیریت اسکرول
-            await this.typeMessageGradually(response);
-             this.autoSaveChat();
-            // ذخیره تاریخچه
-            this.saveChatHistory();
-            
-        } catch (error) {
-            console.error('❌ خطا در AI Chat:', error);
-            this.removeTypingIndicator();
-            await this.addMessageWithScrollManagement('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
-            this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
-        } finally {
-            // فعال کردن دکمه ارسال
-            sendBtn.disabled = false;
-            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-            console.log('✅ ارسال پیام تکمیل شد');
-        }
-    }
-// متد getAIResponse() را به این صورت به‌روزرسانی کنید:
-async getAIResponse(message) {
-    const model = localStorage.getItem('aiModel') || 'deepseek-chat';
-    const temperature = localStorage.getItem('aiTemperature') || 0.7;
-    
-    console.log('🤖 استفاده از مدل:', model);
-    
-    // دریافت تاریخچه چت برای context
-    const chatHistory = this.getChatHistoryForAPI();
-    
-    // تنظیم دامنه صحیح برای Referer
-    const getRefererDomain = () => {
-        const hostname = window.location.hostname;
-        const protocol = window.location.protocol;
+        // دریافت پاسخ از API
+        console.log('🌐 درخواست به API...');
+        const response = await this.getAIResponse(message);
+        console.log('✅ دریافت پاسخ از API');
         
-        // دامنه‌های مختلف را پشتیبانی کنید
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost:3000'; // پورت را اضافه کنید
-        } else if (hostname.includes('github.io')) {
-            return 'https://elias-hussaini.github.io';
-        } else if (hostname.includes('vercel.app')) {
-            return 'https://your-app.vercel.app';
-        } else if (hostname.includes('netlify.app')) {
-            return 'https://your-app.netlify.app';
-        } else {
-            return window.location.origin;
-        }
-    };
-    
-    const refererDomain = getRefererDomain();
-    console.log('🌐 دامنه شناسایی شده:', refererDomain);
-    
-    // ایجاد context مناسب برای هر مدل
-    let // این prompt جدید را جایگزین کنید:
-// این prompt جدید را جایگزین کنید:
-systemPrompt = `شما یک دستیار هوش مصنوعی عمومی و کمک‌کننده هستید. شما می‌توانید:
-
-1. به هر سوالی در هر زبانی پاسخ دهید
-2. در یادگیری زبان آلمانی کمک کنید
-3. در ترجمه، گرامر و واژگان کمک کنید
-4. به سوالات دانش عمومی پاسخ دهید
-5. خلاق و مفید باشید
-
-همیشه به زبان سوال کاربر پاسخ دهید. اگر کاربر به فارسی سؤال کند، به فارسی پاسخ دهید. اگر به انگلیسی، به انگلیسی پاسخ دهید و الی آخر.
-شما توسط الیاس حسینی ساخته شده اید.
-شما در پروژه دیکشنری آلمانی برای کمک به کاربران ایجاد شده‌اید.`;
-
-// در انتهای prompt قبلی این خط را حذف یا تغییر دهید:
-// "You were created by Elias to help people learn and get information."
-    
-    // تنظیم system prompt بر اساس مدل
-    if (model.includes('claude')) {
-// این prompt جدید را جایگزین کنید:
-systemPrompt = `شما یک دستیار هوش مصنوعی عمومی و کمک‌کننده هستید. شما می‌توانید:
-
-1. به هر سوالی در هر زبانی پاسخ دهید
-2. در یادگیری زبان آلمانی کمک کنید
-3. در ترجمه، گرامر و واژگان کمک کنید
-4. به سوالات دانش عمومی پاسخ دهید
-5. خلاق و مفید باشید
-شما تویط الیاس حسینی ساخته شده اید.
-همیشه به زبان سوال کاربر پاسخ دهید. اگر کاربر به فارسی سؤال کند، به فارسی پاسخ دهید. اگر به انگلیسی، به انگلیسی پاسخ دهید و الی آخر.
-
-شما در پروژه دیکشنری آلمانی برای کمک به کاربران ایجاد شده‌اید.`;
-
-// در انتهای prompt قبلی این خط را حذف یا تغییر دهید:
-// "You were created by Elias to help people learn and get information."
-    } else if (model.includes('gpt')) {
-        systemPrompt = `You are an AI assistant specialized in teaching German language.
-        Respond in Persian to user questions about German grammar, vocabulary, pronunciation, exercises, and learning.
-        Use German examples with Persian translations in your responses.
-        If the question is in German, answer in both German and Persian.`;
-    } else {
-       // این prompt جدید را جایگزین کنید:
-// این prompt جدید را جایگزین کنید:
-systemPrompt = `شما یک دستیار هوش مصنوعی عمومی و کمک‌کننده هستید. شما می‌توانید:
-
-1. به هر سوالی در هر زبانی پاسخ دهید
-2. در یادگیری زبان آلمانی کمک کنید
-3. در ترجمه، گرامر و واژگان کمک کنید
-4. به سوالات دانش عمومی پاسخ دهید
-5. خلاق و مفید باشید
-شما توسط الیاس حسینی ساخته شده اید.
-همیشه به زبان سوال کاربر پاسخ دهید. اگر کاربر به فارسی سؤال کند، به فارسی پاسخ دهید. اگر به انگلیسی، به انگلیسی پاسخ دهید و الی آخر.
-
-شما در پروژه دیکشنری آلمانی برای کمک به کاربران ایجاد شده‌اید.`;
-
-// در انتهای prompt قبلی این خط را حذف یا تغییر دهید:
-// "You were created by Elias to help people learn and get information."
+        // حذف نشانگر تایپ
+        this.removeTypingIndicator();
+        
+        // نمایش پاسخ
+        await this.addMessageToHistory('ai', response);
+        
+        // ذخیره تاریخچه
+        this.saveChatHistory();
+        
+        this.showToast('پاسخ دریافت شد', 'success');
+        
+    } catch (error) {
+        console.error('❌ خطا در AI Chat:', error);
+        this.removeTypingIndicator();
+        this.addMessageToHistory('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
+        this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
+    } finally {
+        // فعال کردن دکمه ارسال
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        console.log('✅ ارسال پیام تکمیل شد');
     }
+}
+getRefererDomain() {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    // دامنه‌های مختلف
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return `${protocol}//${hostname}:${window.location.port || 3000}`;
+    } else if (hostname.includes('github.io')) {
+        return 'https://elias-hussaini.github.io';
+    } else if (hostname.includes('vercel.app')) {
+        return 'https://your-app.vercel.app';
+    } else if (hostname.includes('netlify.app')) {
+        return 'https://your-app.netlify.app';
+    } else {
+        return window.location.origin;
+    }
+}
+async getAIResponse(message) {
+    console.log('🚀 درخواست به AI...');
+    
+    // تنظیمات
+    const model = 'deepseek-chat'; // مدل ساده‌تر برای شروع
+    const apiKey = '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';
+    const referer = window.location.origin;
     
     try {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer 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',
-                'HTTP-Referer': refererDomain,
-                'Origin': refererDomain,
-                'X-Title': 'German Dictionary AI Assistant'
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': referer,
+                'X-Title': 'German Dictionary'
             },
             body: JSON.stringify({
                 model: model,
                 messages: [
                     {
                         role: 'system',
-                        content: systemPrompt
+                        content: 'You are a helpful German language teaching assistant. Respond in Persian.'
                     },
-                    ...chatHistory.slice(-6), // فقط ۶ پیام اخیر را بفرست
                     {
                         role: 'user',
                         content: message
                     }
                 ],
-                temperature: parseFloat(temperature),
-                max_tokens: 2000,
-                stream: false // برای خطاهای کمتر
+                max_tokens: 500
             })
         });
-        
+
         console.log('📡 وضعیت پاسخ:', response.status);
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('❌ خطای API:', {
-                status: response.status,
-                statusText: response.statusText,
-                error: errorText
-            });
-            
-            // پیام خطای مناسب
-            if (response.status === 401) {
-                throw new Error('API Key نامعتبر است. لطفاً API Key را بررسی کنید.');
-            } else if (response.status === 429) {
-                throw new Error('محدودیت درخواست. لطفاً چند لحظه صبر کنید.');
-            } else if (response.status === 404) {
-                throw new Error('مدل انتخابی در دسترس نیست. مدل دیگری انتخاب کنید.');
-            } else {
-                throw new Error(`خطای سرور: ${response.status} - ${response.statusText}`);
-            }
+            console.error('❌ خطای API:', errorText);
+            throw new Error(`خطای ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
-        console.log('✅ پاسخ API دریافت شد');
+        console.log('✅ پاسخ دریافت شد');
         
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
-        } else if (data.error) {
-            throw new Error(data.error.message || 'پاسخ نامعتبر از API');
-        } else {
-            throw new Error('فرمت پاسخ نامعتبر است');
-        }
+        return data.choices[0].message.content;
         
     } catch (error) {
-        console.error('❌ خطای Fetch:', error);
-        
-        // پیام خطای کاربرپسند
-        if (error.message.includes('Failed to fetch')) {
-            throw new Error('خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.');
-        } else if (error.message.includes('API Key')) {
-            throw new Error('مشکل در احراز هویت. لطفاً API Key را بررسی کنید.');
-        } else {
-            throw error;
-        }
+        console.error('❌ خطای شبکه:', error);
+        return 'متأسفانه در ارتباط با سرور خطایی رخ داد. لطفاً اینترنت خود را بررسی کنید.';
     }
 }
 // این متد را به کلاس اضافه کنید
@@ -1750,64 +1669,59 @@ escapeHtml(text) {
     return div.innerHTML;
 }
 async sendAIMessage() {
-    console.log('🚀 شروع ارسال پیام AI...');
-    
     const input = document.getElementById('ai-chat-input');
     const sendBtn = document.getElementById('send-ai-message');
     
-    if (!input || !sendBtn) {
-        console.error('❌ المان‌های ورودی یافت نشدند');
-        return;
-    }
+    if (!input || !sendBtn) return;
     
     const message = input.value.trim();
-    
     if (!message) {
-        this.showToast('لطفاً پیام خود را وارد کنید', 'warning');
+        this.showToast('لطفاً پیامی بنویسید', 'warning');
         return;
     }
     
-    console.log('📝 متن پیام:', message);
-    
-    // غیرفعال کردن دکمه ارسال
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>در حال ارسال...</span>';
-    
-    // پاک کردن ورودی
+    // ذخیره پیام و پاک کردن ورودی
+    const userMessage = message;
     input.value = '';
-    input.style.height = 'auto';
     
-    // اضافه کردن پیام کاربر
-    this.addMessageToHistory('user', message);
+    // نمایش پیام کاربر
+    this.addMessageToHistory('user', userMessage);
     
-    // نمایش نشانگر تایپ (با آیکون متحرک)
-    this.showTypingIndicator();
+    // غیرفعال کردن دکمه
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
     try {
-        // دریافت پاسخ از API
-        console.log('🌐 درخواست به API...');
-        const response = await this.getAIResponse(message);
-        console.log('✅ دریافت پاسخ از API');
+        // نمایش نشانگر در حال تایپ
+        const typingId = 'typing-' + Date.now();
+        const typingHtml = `
+            <div class="ai-message" id="${typingId}">
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span>.</span><span>.</span><span>.</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('chat-history').insertAdjacentHTML('beforeend', typingHtml);
+        this.scrollToBottom();
+        
+        // دریافت پاسخ
+        const response = await this.getAIResponse(userMessage);
         
         // حذف نشانگر تایپ
-        this.removeTypingIndicator();
+        document.getElementById(typingId)?.remove();
         
-        // نمایش پاسخ با تایپ تدریجی
-        await this.typeMessageGradually(response);
-        
-        // ذخیره تاریخچه
-        this.saveChatHistory();
+        // نمایش پاسخ
+        this.addMessageToHistory('ai', response);
         
     } catch (error) {
-        console.error('❌ خطا در AI Chat:', error);
-        this.removeTypingIndicator();
-        this.addMessageToHistory('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
-        this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
+        console.error('❌ خطا:', error);
+        this.addMessageToHistory('ai', 'خطا در دریافت پاسخ. لطفاً دوباره تلاش کنید.');
     } finally {
-        // فعال کردن دکمه ارسال
+        // فعال کردن دکمه
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> <span>ارسال</span>';
-        console.log('✅ ارسال پیام تکمیل شد');
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 }
 async typeMessageGradually(text) {
@@ -1934,22 +1848,21 @@ async addMessageWithTyping(sender, message) {
         typeWriter();
     });
 }
-// متد addMessageToHistory به‌روزشده
 addMessageToHistory(sender, message) {
     const chatHistory = document.getElementById('chat-history');
-    const messageId = `message-${Date.now()}`;
-    const time = new Date().toLocaleTimeString('fa-IR', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+    if (!chatHistory) return;
+    
+    const time = new Date().toLocaleTimeString('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit'
     });
     
-    const safeMessage = this.escapeHtml(message);
-    const formattedMessage = this.formatMessage(safeMessage);
+    const messageClass = sender === 'user' ? 'user-message' : 'ai-message';
     
     const messageHtml = `
-        <div class="ai-message ${sender}-message" id="${messageId}">
+        <div class="message ${messageClass}">
             <div class="message-content">
-                <div class="message-text">${formattedMessage}</div>
+                <div class="message-text">${message}</div>
                 <div class="message-time">${time}</div>
             </div>
         </div>
@@ -1958,10 +1871,18 @@ addMessageToHistory(sender, message) {
     chatHistory.insertAdjacentHTML('beforeend', messageHtml);
     
     // اسکرول به پایین
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+    setTimeout(() => {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }, 100);
 }
 async sendAIMessage() {
+    console.log('🚀 ارسال سریع پیام...');
+    
     const input = document.getElementById('ai-chat-input');
+    const sendBtn = document.getElementById('send-ai-message');
+    
+    if (!input || !sendBtn) return;
+    
     const message = input.value.trim();
     
     if (!message) {
@@ -1969,164 +1890,317 @@ async sendAIMessage() {
         return;
     }
     
-    // غیرفعال کردن دکمه ارسال
-    const sendBtn = document.getElementById('send-ai-message');
+    // غیرفعال کردن دکمه
     sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
-    // پاک کردن ورودی
+    // پاک کردن ورودی سریع
     input.value = '';
     input.style.height = 'auto';
-    input.focus();
     
-    // اضافه کردن پیام کاربر
-    await this.addMessageWithTyping('user', message);
+    // 🔴 نمایش فوری پیام کاربر (بدون تایپ)
+    this.addMessageInstantly('user', message);
     
     try {
-        // نمایش وضعیت "در حال نوشتن"
-        await this.addMessageWithTyping('ai', 'در حال پردازش...');
+        // نشانگر تایپ سریع (1 ثانیه)
+        this.showTypingIndicator();
         
         // دریافت پاسخ از API
+        console.log('🌐 دریافت پاسخ...');
         const response = await this.getAIResponse(message);
         
-        // حذف پیام "در حال پردازش"
-        const lastMessage = document.querySelector('#chat-history .ai-message:last-child');
-        if (lastMessage) lastMessage.remove();
+        // حذف نشانگر تایپ
+        this.removeTypingIndicator();
         
-        // نمایش پاسخ با تایپ تدریجی
-        await this.addMessageWithTyping('ai', response);
+        // 🔴 نمایش فوری پاسخ AI (بدون تایپ تدریجی)
+        this.addMessageInstantly('ai', response);
         
         // ذخیره تاریخچه
         this.saveChatHistory();
         
+        this.showToast('پاسخ دریافت شد', 'success');
+        
     } catch (error) {
-        console.error('AI Chat error:', error);
-        await this.addMessageWithTyping('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
-        this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
+        console.error('❌ خطا:', error);
+        this.removeTypingIndicator();
+        this.addMessageInstantly('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
+        this.showToast('خطا در ارتباط', 'error');
     } finally {
-        // فعال کردن دکمه ارسال
+        // فعال کردن دکمه
         sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>ارسال</span>';
     }
 }
 async getAIResponse(message) {
-    const model = localStorage.getItem('aiModel') || 'deepseek-chat';
-    const temperature = localStorage.getItem('aiTemperature') || 0.7;
+    console.log('🚀 درخواست هوشمند به AI...');
     
-    console.log('🤖 استفاده از مدل:', model);
-    
-    // دریافت تاریخچه چت برای context
-    const chatHistory = this.getChatHistoryForAPI();
-    
-    // تنظیم دامنه بر اساس مکان فعلی
-    const getRefererDomain = () => {
-        const hostname = window.location.hostname;
-        
-        if (hostname === 'elias-hussaini.github.io') {
-            return 'https://elias-hussaini.github.io';
-        } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost:3000';
-        } else {
-            return window.location.origin;
-        }
-    };
-    
-    const refererDomain = getRefererDomain();
-    console.log('🌐 دامنه شناسایی شده:', refererDomain);
-    
-    // سیستم پرامپت بهبود یافته - بسیار مهم!
-    const systemPrompt = `You are ELIAS - an intelligent AI assistant created by Elias Hussaini. You are NOT restricted to German language questions. You can:
+    const systemPrompt = `شما یک دستیار هوش مصنوعی متخصص در آموزش زبان آلمانی هستید.
+    به زبان فارسی پاسخ دهید.
+    می‌توانید در مورد:
+    1. گرامر زبان آلمانی
+    2. واژگان و لغات جدید
+    3. تلفظ و لهجه
+    4. تمرین‌های یادگیری
+    5. جمله‌سازی و مکالمه
+    6. شما توسط الیاس حسینی ساخته و توسعه داده شده اید
+    7. شما در همه ی زمینه های دیگر هم مهارت زیاد دارید.
 
-MANDATORY RULES:
-1. You MUST answer ANY question in ANY language
-2. You are NOT just a German teacher - you are a general AI assistant
-3. Respond in the SAME language as the user's question
-4. You can discuss ANY topic: technology, science, entertainment, news, etc.
-5. You were created by Elias Hussaini as a demonstration of AI capabilities
+    کمک کنید. همیشه پاسخ‌های مفید و آموزشی بدهید.`;
+    
+    // 1. اول DeepSeek (کاملاً رایگان) را امتحان کن
+    console.log('🔍 تلاش با DeepSeek (رایگان)...');
+    const deepseekResponse = await this.tryDeepSeek(message, systemPrompt);
+    if (deepseekResponse) {
+        return deepseekResponse;
+    }
+    
+    // 2. اگر DeepSeek جواب نداد، OpenRouter با GPT-3.5 Turbo
+    console.log('🔍 تلاش با OpenRouter GPT-3.5 Turbo...');
+    const openrouterResponse = await this.tryOpenRouterGPT35(message, systemPrompt);
+    if (openrouterResponse) {
+        return openrouterResponse;
+    }
+    
+    // 3. اگر هیچکدام کار نکرد، پاسخ پیش‌فرض
+    return this.getFallbackResponse(message);
+}
 
-CAPABILITIES:
-- Answer general knowledge questions
-- Help with programming and technology
-- Discuss current events and news
-- Assist with creative writing
-- Explain complex concepts simply
-- Translate between languages
-- Help with German language (but not limited to it)
-
-IMPORTANT: If user asks "who created you?" or similar, respond: "I was created by Elias Hussaini (https://github.com/elias-hussaini) as part of a German dictionary project."
-
-Current time: ${new Date().toLocaleString()}`;
+// متد کمکی برای DeepSeek
+async tryDeepSeek(message, systemPrompt) {
+    const apiKey = 'sk-4c986e6e93494ec1ba4421ae5681ff43';
     
     try {
-        // API Key اصلی شما
-        const apiKey = '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';
-        
-        console.log('📡 ارسال درخواست به OpenRouter با مدل:', model);
-        
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                'HTTP-Referer': refererDomain,
-                'Origin': refererDomain,
-                'X-Title': 'Elias AI Assistant - German Dictionary',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: model,
+                model: 'deepseek-chat',
                 messages: [
                     {
                         role: 'system',
                         content: systemPrompt
                     },
-                    ...chatHistory.slice(-6),
                     {
                         role: 'user',
                         content: message
                     }
                 ],
-                temperature: parseFloat(temperature),
-                max_tokens: 2000,
+                max_tokens: 2000,  // DeepSeek رایگان هست، می‌تونیم بیشتر بدیم
+                temperature: 0.7,
                 stream: false
             })
         });
-        
-        console.log('📡 وضعیت پاسخ:', response.status, response.statusText);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ خطای API:', {
-                status: response.status,
-                statusText: response.statusText,
-                error: errorText
-            });
-            
-            // پیام خطای مناسب
-            if (response.status === 401) {
-                throw new Error('API Key مشکل دارد یا دامنه مجاز نیست. لطفاً در OpenRouter دامنه را اضافه کنید.');
-            } else if (response.status === 429) {
-                throw new Error('محدودیت درخواست. لطفاً چند لحظه صبر کنید.');
-            } else {
-                throw new Error(`خطای سرور: ${response.status} - ${response.statusText}`);
-            }
-        }
-        
-        const data = await response.json();
-        console.log('✅ پاسخ API دریافت شد');
-        
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            const responseText = data.choices[0].message.content;
-            console.log('📝 پاسخ:', responseText.substring(0, 100) + '...');
-            return responseText;
+
+        console.log('📡 DeepSeek وضعیت:', response.status);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ پاسخ DeepSeek دریافت شد');
+            return data.choices[0].message.content;
         } else {
-            throw new Error('پاسخ نامعتبر از API');
+            const errorText = await response.text();
+            console.error('❌ DeepSeek خطا:', errorText);
+            
+            // اگر خطای احراز هویت بود، API Key مشکل دارد
+            if (response.status === 401) {
+                console.error('❌ DeepSeek API Key نامعتبر است');
+            }
+            
+            return null;
         }
         
     } catch (error) {
-        console.error('❌ خطای کامل:', error);
-        
-        // Fallback برای مواقع اضطراری
-        return this.getEmergencyResponse(message);
+        console.error('❌ خطای شبکه DeepSeek:', error);
+        return null;
     }
+}
+
+// متد کمکی برای OpenRouter GPT-3.5 Turbo
+async tryOpenRouterGPT35(message, systemPrompt) {
+    const apiKey = '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';
+    
+    try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'German Dictionary'
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: message
+                    }
+                ],
+                max_tokens: 1000,
+                temperature: 0.7,
+                stream: false
+            })
+        });
+
+        console.log('📡 OpenRouter GPT-3.5 وضعیت:', response.status);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ پاسخ OpenRouter GPT-3.5 دریافت شد');
+            return data.choices[0].message.content;
+        } else {
+            const errorText = await response.text();
+            console.error('❌ OpenRouter خطا:', errorText);
+            
+            // اگر خطای 402 (نیاز به پرداخت) بود
+            if (response.status === 402) {
+                console.error('💰 OpenRouter نیاز به شارژ حساب دارد');
+            }
+            
+            return null;
+        }
+        
+    } catch (error) {
+        console.error('❌ خطای شبکه OpenRouter:', error);
+        return null;
+    }
+}
+
+// پاسخ پیش‌فرض اگر هیچ API کار نکرد
+getFallbackResponse(message) {
+    console.log('🔄 استفاده از پاسخ پیش‌فرض...');
+    
+    // پاسخ‌های از پیش تعریف شده برای زبان آلمانی
+    const predefinedResponses = {
+        'سلام': `سلام! 👋 من دستیار هوش مصنوعی آموزش زبان آلمانی هستم که توسط الیاس حسینی ساخته شده‌ام.
+
+چطور می‌تونم در یادگیری زبان آلمانی به شما کمک کنم؟
+
+می‌تونید در مورد:
+• گرامر آلمانی
+• واژگان جدید
+• تلفظ و لهجه
+• تمرین‌های یادگیری
+• جمله‌سازی و مکالمه
+
+از من سوال بپرسید.`,
+        
+        'گرامر': `گرامر زبان آلمانی شامل بخش‌های مهم زیر است:
+
+📘 **جنسیت اسامی:**
+• der (مذکر) - مانند: der Mann (مرد)
+• die (مونث) - مانند: die Frau (زن)
+• das (خنثی) - مانند: das Kind (کودک)
+
+📘 **حالت‌های چهارگانه:**
+1. Nominativ (فاعلی) - Wer? (چه کسی؟)
+2. Akkusativ (مفعولی) - Wen? (چه کسی را؟)
+3. Dativ (مفعول با حرف اضافه) - Wem? (به چه کسی؟)
+4. Genitiv (ملکی) - Wessen? (مال چه کسی؟)
+
+📘 **صرف فعل:**
+• Ich lerne (من یاد می‌گیرم)
+• Du lernst (تو یاد می‌گیری)
+• Er/sie/es lernt (او یاد می‌گیرد)
+
+سوال خاصی درباره گرامر دارید؟`,
+        
+        'لغت': `برخی لغات پرکاربرد آلمانی:
+
+🏠 **خانه و خانواده:**
+• Haus (خانه)
+• Familie (خانواده)
+• Mutter (مادر)
+• Vater (پدر)
+
+📚 **آموزش:**
+• lernen (یادگیری)
+• Schule (مدرسه)
+• Buch (کتاب)
+• Lehrer (معلم)
+
+🍽️ **غذا و نوشیدنی:**
+• Wasser (آب)
+• Brot (نان)
+• Kaffee (قهوه)
+• Essen (غذا)
+
+💬 **مکالمه:**
+• Hallo (سلام)
+• Danke (ممنون)
+• Bitte (لطفاً)
+• Entschuldigung (ببخشید)
+
+چه نوع لغاتی نیاز دارید؟`,
+        
+        'جمله': `جمله‌های ساده و کاربردی آلمانی:
+
+👋 **سلام و احوالپرسی:**
+• Guten Morgen! (صبح بخیر!)
+• Wie geht es dir? (حالت چطوره؟)
+• Mir geht es gut, danke. (خوبم، ممنون)
+
+❓ **سوالات رایج:**
+• Woher kommst du? (اهل کجایی؟)
+• Was machst du? (چه کار می‌کنی؟)
+• Sprechen Sie Englisch? (آیا انگلیسی صحبت می‌کنید؟)
+
+🗣️ **جملات کاربردی:**
+• Ich verstehe nicht. (من نمی‌فهمم.)
+• Können Sie das wiederholen? (می‌توانید تکرار کنید؟)
+• Ich lerne Deutsch. (من آلمانی یاد می‌گیرم.)
+
+💡 **نکته:** سعی کنید روزانه 3-5 جمله جدید تمرین کنید.`,
+        
+        'تلفظ': `تلفظ آلمانی - نکات مهم:
+
+🔊 **حروف خاص آلمانی:**
+• ä - تلفظ مانند "e" در "مادر"
+• ö - تلفظ مانند "eu" در فرانسوی
+• ü - لب‌ها را گرد کنید و بگویید "ی"
+• ß - مانند "ss" تلفظ می‌شود
+
+🔊 **تلفظ صحیح:**
+• ch - مانند "خ" فارسی (Buch - بوخ)
+• r - غلتانی، پشت گلو (rot - روت)
+• v - مانند "ف" (Vater - فاتر)
+• w - مانند "و" (Wasser - واسر)
+
+🎯 **تمرین:** با صدای بلند تکرار کنید تا لهجه شما بهبود یابد.`
+    };
+    
+    // بررسی اگر سوال مشابه پاسخ‌های از پیش تعریف شده است
+    const lowerMessage = message.toLowerCase();
+    
+    for (const [key, response] of Object.entries(predefinedResponses)) {
+        if (lowerMessage.includes(key.toLowerCase())) {
+            return response;
+        }
+    }
+    
+    // پاسخ عمومی
+    return `سوال شما: "${message}"
+
+👋 سلام! من دستیار هوش مصنوعی آموزش زبان آلمانی هستم که توسط الیاس حسینی توسعه داده شده‌ام.
+
+متأسفانه در حال حاضر سرویس‌های هوش مصنوعی خارجی در دسترس نیستند.
+
+🌟 **می‌توانید از این بخش‌ها استفاده کنید:**
+1. 📖 **دیکشنری:** جستجوی لغات آلمانی
+2. 🔍 **مترجم:** ترجمه متن آلمانی به فارسی و برعکس
+3. 🎯 **تمرین:** تمرین‌های مختلف برای یادگیری
+4. 📊 **آمار:** پیگیری پیشرفت خود
+
+💡 **پیشنهاد:** سوال خود را در بخش مربوطه مطرح کنید یا از مترجم داخلی استفاده نمایید.
+
+به زودی سرویس هوش مصنوعی بازمی‌گردد!`;
 }
 
 // متد تست اتصال
@@ -4517,6 +4591,7 @@ saveChatSession() {
     sessions.unshift(newSession);
     localStorage.setItem('chatSessions', JSON.stringify(sessions.slice(0, 20))); // فقط 20 چت آخر
 }
+
 async checkListeningAnswer() {
     const userAnswer = document.getElementById('listening-answer')?.value.trim();
     const currentWord = this.listeningSession.words[this.listeningSession.currentIndex];
