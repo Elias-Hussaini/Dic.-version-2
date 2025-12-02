@@ -1272,7 +1272,7 @@ async sendAIMessage() {
         // ذخیره تاریخچه
         this.saveChatHistory();
         
-        this.showToast('پاسخ دریافت شد', 'success');
+        
         
     } catch (error) {
         console.error('❌ خطا در AI Chat:', error);
@@ -1308,7 +1308,7 @@ async getAIResponse(message) {
     
     // تنظیمات
     const model = 'deepseek-chat'; // مدل ساده‌تر برای شروع
-    const apiKey = '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';
+    const apiKey = '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';
     const referer = window.location.origin;
     
     try {
@@ -1918,7 +1918,7 @@ async sendAIMessage() {
         // ذخیره تاریخچه
         this.saveChatHistory();
         
-        this.showToast('پاسخ دریافت شد', 'success');
+        
         
     } catch (error) {
         console.error('❌ خطا:', error);
@@ -2020,7 +2020,7 @@ async tryDeepSeek(message, systemPrompt) {
 
 // متد کمکی برای OpenRouter GPT-3.5 Turbo
 async tryOpenRouterGPT35(message, systemPrompt) {
-    const apiKey = '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';
+    const apiKey = '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';
     
     try {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
