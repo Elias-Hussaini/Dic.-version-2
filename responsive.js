@@ -47,6 +47,7 @@ function loadSectionContent(sectionName) {
 
 // اضافه کردن متدهای ضروری به کلاس GermanDictionary
 class GermanDictionary {
+  
     constructor() {
         // کدهای موجود...
         

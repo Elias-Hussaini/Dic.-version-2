@@ -6,14 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize Dictionary App
   // =====================
   class GermanDictionary {
-    constructor() {
-   this.dbName = 'GermanPersianDictionary';
-      this.dbVersion = 2;
-      this.db = null;
-      this.currentWord = null;
-      this.favorites = new Set();
-       this.translateDirection = 'de-fa';
-           this.isVoiceInputActive = false;
+   constructor() {
+    this.dbName = 'GermanPersianDictionary';
+    this.dbVersion = 3;
+    this.db = null;
+    this.currentWord = null;
+    this.favorites = new Set();
+    this.translateDirection = 'de-fa';
+    this.isVoiceInputActive = false;
     this.voiceRecognition = null;
     this.voiceTimerInterval = null;
     this.voiceStartTime = null;
@@ -24,29 +24,26 @@ document.addEventListener('DOMContentLoaded', function() {
         language: 'fa-IR',
         autoPlay: true
     };
-     this.scrollCheckInterval = null;
-      this.scrollState = {
+    this.scrollCheckInterval = null;
+    this.scrollState = {
         isAtBottom: true,
         isUserScrolling: false,
         lastScrollTop: 0,
         scrollTimeout: null
     };
-     this.isAITyping = false; // این خط را اضافه کنید
-    this.isUserScrollingManually = false; // این خط را اضافه کنید
-    this.loadChatHistory();
+    this.isAITyping = false;
+    this.isUserScrollingManually = false;
+    
+    // فقط یک بار init را صدا بزن
     this.init();
-   this.loadChatHistory();
-      this.init();
-      this.tempVerbData = null;
-      window.addEventListener('resize', () => {
-  this.handleResponsive();
-      setTimeout(() => {
-        
-    }, 500);
-
-});
-      
-    }
+    
+    window.addEventListener('resize', () => {
+        this.handleResponsive();
+        setTimeout(() => {
+            // هیچ کاری لازم نیست
+        }, 500);
+    });
+}
     
     handleResponsive() {
   const sidebar = document.querySelector('.sidebar');
@@ -204,24 +201,35 @@ handleScroll() {
         this.scrollState.isUserScrolling = false;
     }, 1500);
 }
-async addMessageToHistory(sender, message) {
+async addMessageToHistory(sender, message, options = {}) {
+    const { skipScroll = false, isTyping = false } = options;
     const chatHistory = document.getElementById('chat-history');
-    if (!chatHistory) return;
     
-    const messageId = `message-${Date.now()}`;
+    if (!chatHistory) {
+        console.error('❌ تاریخچه چت یافت نشد!');
+        return;
+    }
+    
+    const messageId = isTyping ? 'typing-indicator' : `message-${Date.now()}`;
     const time = new Date().toLocaleTimeString('fa-IR', { 
         hour: '2-digit', 
         minute: '2-digit' 
     });
     
-    const safeMessage = this.escapeHtml(message);
-    const formattedMessage = this.formatMessage(safeMessage);
+    // فرمت‌بندی پیام با دکمه‌ها
+    let formattedMessage = this.formatMessage(message);
     
-    // 🔴 بدون تایپ تدریجی - مستقیم نمایش بده
+    // اضافه کردن دکمه‌های هدایت به پیام‌های AI
+    let quickActionsHtml = '';
+    if (sender === 'ai' && !isTyping) {
+        quickActionsHtml = this.getQuickActionButtons(message);
+    }
+    
     const messageHtml = `
         <div class="ai-message ${sender}-message" id="${messageId}">
             <div class="message-content">
                 <div class="message-text">${formattedMessage}</div>
+                ${quickActionsHtml}
                 <div class="message-time">${time}</div>
             </div>
         </div>
@@ -229,9 +237,21 @@ async addMessageToHistory(sender, message) {
     
     chatHistory.insertAdjacentHTML('beforeend', messageHtml);
     
-    // اسکرول به پایین
-    this.scrollToBottom();
+    // تنظیم event listeners برای دکمه‌ها
+    if (sender === 'ai' && !isTyping && quickActionsHtml) {
+        setTimeout(() => {
+            this.setupQuickActionButtons(messageId);
+        }, 100);
+    }
     
+    // اسکرول
+    if (!skipScroll) {
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 50);
+    }
+    
+    console.log(`📨 پیام ${sender} اضافه شد`);
     return messageId;
 }
     
@@ -447,52 +467,47 @@ renderAIChat() {
             <div class="ai-chat-main">
                 <!-- تاریخچه چت -->
                 <div class="chat-messages-container" id="chat-history">
-                    <div class="welcome-message">
-                        <div class="message ai-message">
-                            <div class="message-avatar">
-                                <i class="fas fa-robot"></i>
-                            </div>
-                            <div class="message-content">
-                                <div class="message-text">
-                                    <h4>👋 سلام! من دستیار هوش مصنوعی شما هستم</h4>
-                                    <p>می‌توانید هر سوالی درباره زبان آلمانی از من بپرسید:</p>
-                                    
-                                    <div class="features-grid">
-                                        <div class="feature-item">
-                                            <i class="fas fa-language"></i>
-                                            <span>گرامر و دستور زبان</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-book"></i>
-                                            <span>واژگان و لغات جدید</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-comments"></i>
-                                            <span>جمله‌سازی و مکالمه</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-volume-up"></i>
-                                            <span>تلفظ و لهجه‌گیری</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-pen"></i>
-                                            <span>تمرین و تست</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-lightbulb"></i>
-                                            <span>راهنمایی یادگیری</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="welcome-tip">
-                                        <i class="fas fa-info-circle"></i>
-                                        از دکمه‌های پایین برای سوالات سریع یا گفتگوی صوتی استفاده کنید
-                                    </div>
-                                </div>
-                                <div class="message-time">همین الان</div>
-                            </div>
-                        </div>
-                    </div>
+                    // در welcome message داخل renderAIChat():
+<div class="welcome-message">
+    <div class="message ai-message">
+        <div class="message-avatar">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="message-content">
+            <div class="message-text">
+                <h4>🤖 دستیار هوش مصنوعی آلمانی</h4>
+                <p>سرویس هوش مصنوعی فعلاً در دسترس نیست</p>
+                
+                <p>اما می‌توانید از بخش‌های کامل برنامه استفاده کنید:</p>
+                
+                <div class="quick-action-buttons">
+                    <button class="quick-action-btn" data-action="dictionary">
+                        <i class="fas fa-search"></i>
+                        جستجوی لغات
+                    </button>
+                    <button class="quick-action-btn" data-action="translate">
+                        <i class="fas fa-language"></i>
+                        مترجم متن
+                    </button>
+                    <button class="quick-action-btn" data-action="practice">
+                        <i class="fas fa-brain"></i>
+                        تمرین آموزشی
+                    </button>
+                    <button class="quick-action-btn" data-action="word-list">
+                        <i class="fas fa-list"></i>
+                        همه لغات
+                    </button>
+                </div>
+                
+                <div class="welcome-tip" style="margin-top: 15px;">
+                    <i class="fas fa-info-circle"></i>
+                    هر سوالی دارید بپرسید، شما را راهنمایی می‌کنم
+                </div>
+            </div>
+            <div class="message-time">همین الان</div>
+        </div>
+    </div>
+</div>
                 </div>
 
                 <!-- پیشنهادات سریع با دکمه‌های صوتی -->
@@ -566,18 +581,10 @@ renderAIChat() {
                             <span>مدل هوش مصنوعی:</span>
                         </div>
                         <div class="model-select-wrapper">
-           <select id="ai-model-select" class="model-select">
-    <!-- مدل‌های DeepSeek -->
-    <option value="deepseek-chat" selected>🤖 DeepSeek Chat (گفتگو - پیشنهادی)</option>
-    <option value="deepseek-coder">💻 DeepSeek Coder (برنامه‌نویسی)</option>
-    <option value="deepseek-reasoner">🔍 DeepSeek Reasoner (استدلال)</option>
-    
-    <!-- GPT-3.5 Turbo -->
-    <option value="gpt-3.5-turbo">⚡ GPT-3.5 Turbo (سریع و پایدار)</option>
-    
-    <!-- GPT-4 (اگر حساب شارژ باشد) -->
-    <option value="gpt-4o">🚀 GPT-4o (پیشرفته)</option>
-</select>
+     <select id="ai-model-select" class="model-select">
+        <option value="liara-gpt-3.5-turbo" selected>🤖 Liara AI (GPT-3.5 Turbo)</option>
+        <option value="fallback">📚 پاسخ‌های داخلی</option>
+    </select>
                             <div class="model-info-icon" title="اطلاعات مدل">
                                 <i class="fas fa-info-circle"></i>
                             </div>
@@ -1222,9 +1229,8 @@ resetVoiceSettings() {
     this.setupScrollManagement();
 }
 
-
 async sendAIMessage() {
-    console.log('🚀 شروع ارسال پیام AI...');
+    console.log('🚀 ارسال پیام AI (نسخه ساده)');
     
     const input = document.getElementById('ai-chat-input');
     const sendBtn = document.getElementById('send-ai-message');
@@ -1241,7 +1247,7 @@ async sendAIMessage() {
         return;
     }
     
-    console.log('📝 متن پیام:', message);
+    console.log('📝 متن پیام کاربر:', message);
     
     // غیرفعال کردن دکمه ارسال
     sendBtn.disabled = true;
@@ -1255,34 +1261,30 @@ async sendAIMessage() {
     this.addMessageToHistory('user', message);
     
     try {
-        // نمایش نشانگر تایپ
+        // نمایش نشانگر در حال تایپ (برای تأخیر طبیعی)
         this.showTypingIndicator();
         
-        // دریافت پاسخ از API
-        console.log('🌐 درخواست به API...');
-        const response = await this.getAIResponse(message);
-        console.log('✅ دریافت پاسخ از API');
+        // تأخیر مصنوعی برای طبیعی‌تر شدن
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         // حذف نشانگر تایپ
         this.removeTypingIndicator();
         
-        // نمایش پاسخ
+        // نمایش پاسخ ثابت
+        const response = await this.getAIResponse(message);
         await this.addMessageToHistory('ai', response);
         
         // ذخیره تاریخچه
         this.saveChatHistory();
         
-        
-        
     } catch (error) {
-        console.error('❌ خطا در AI Chat:', error);
+        console.error('❌ خطا:', error);
         this.removeTypingIndicator();
-        this.addMessageToHistory('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
-        this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
+        this.addMessageToHistory('ai', 'خطا در پردازش درخواست. لطفاً دوباره تلاش کنید.');
     } finally {
         // فعال کردن دکمه ارسال
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>ارسال</span>';
         console.log('✅ ارسال پیام تکمیل شد');
     }
 }
@@ -1303,57 +1305,7 @@ getRefererDomain() {
         return window.location.origin;
     }
 }
-async getAIResponse(message) {
-    console.log('🚀 درخواست به AI...');
-    
-    // تنظیمات
-    const model = 'deepseek-chat'; // مدل ساده‌تر برای شروع
-    const apiKey = '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';
-    const referer = window.location.origin;
-    
-    try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                'HTTP-Referer': referer,
-                'X-Title': 'German Dictionary'
-            },
-            body: JSON.stringify({
-                model: model,
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are a helpful German language teaching assistant. Respond in Persian.'
-                    },
-                    {
-                        role: 'user',
-                        content: message
-                    }
-                ],
-                max_tokens: 500
-            })
-        });
 
-        console.log('📡 وضعیت پاسخ:', response.status);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ خطای API:', errorText);
-            throw new Error(`خطای ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('✅ پاسخ دریافت شد');
-        
-        return data.choices[0].message.content;
-        
-    } catch (error) {
-        console.error('❌ خطای شبکه:', error);
-        return 'متأسفانه در ارتباط با سرور خطایی رخ داد. لطفاً اینترنت خود را بررسی کنید.';
-    }
-}
 // این متد را به کلاس اضافه کنید
 async testAllModels() {
     const models = [
@@ -1669,59 +1621,69 @@ escapeHtml(text) {
     return div.innerHTML;
 }
 async sendAIMessage() {
+    console.log('🚀 ارسال پیام به Liara AI...');
+    
     const input = document.getElementById('ai-chat-input');
     const sendBtn = document.getElementById('send-ai-message');
     
-    if (!input || !sendBtn) return;
-    
-    const message = input.value.trim();
-    if (!message) {
-        this.showToast('لطفاً پیامی بنویسید', 'warning');
+    if (!input || !sendBtn) {
+        console.error('❌ المان‌های ورودی یافت نشدند');
         return;
     }
     
-    // ذخیره پیام و پاک کردن ورودی
-    const userMessage = message;
-    input.value = '';
+    const message = input.value.trim();
     
-    // نمایش پیام کاربر
-    this.addMessageToHistory('user', userMessage);
+    if (!message) {
+        this.showToast('لطفاً پیام خود را وارد کنید', 'warning');
+        return;
+    }
     
-    // غیرفعال کردن دکمه
+    console.log('📝 متن پیام:', message);
+    
+    // غیرفعال کردن دکمه ارسال
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
+    // پاک کردن ورودی
+    input.value = '';
+    input.style.height = 'auto';
+    
+    // اضافه کردن پیام کاربر
+    this.addMessageToHistory('user', message);
+    
     try {
         // نمایش نشانگر در حال تایپ
-        const typingId = 'typing-' + Date.now();
-        const typingHtml = `
-            <div class="ai-message" id="${typingId}">
-                <div class="message-content">
-                    <div class="typing-indicator">
-                        <span>.</span><span>.</span><span>.</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.getElementById('chat-history').insertAdjacentHTML('beforeend', typingHtml);
-        this.scrollToBottom();
+        this.showTypingIndicator();
         
-        // دریافت پاسخ
-        const response = await this.getAIResponse(userMessage);
+        // دریافت پاسخ از Liara AI
+        console.log('🌐 درخواست به Liara AI...');
+        const response = await this.getAIResponse(message);
+        console.log('✅ دریافت پاسخ از Liara AI');
         
         // حذف نشانگر تایپ
-        document.getElementById(typingId)?.remove();
+        this.removeTypingIndicator();
         
         // نمایش پاسخ
-        this.addMessageToHistory('ai', response);
+        await this.addMessageToHistory('ai', response);
+        
+        // ذخیره تاریخچه
+        this.saveChatHistory();
+        
+        // پخش خودکار پاسخ (اگر تنظیم شده باشد)
+        if (this.currentVoiceSettings.autoPlay) {
+            setTimeout(() => this.speakText(response), 500);
+        }
         
     } catch (error) {
-        console.error('❌ خطا:', error);
-        this.addMessageToHistory('ai', 'خطا در دریافت پاسخ. لطفاً دوباره تلاش کنید.');
+        console.error('❌ خطا در AI Chat:', error);
+        this.removeTypingIndicator();
+        this.addMessageToHistory('ai', 'متأسفانه در دریافت پاسخ خطایی رخ داده است. لطفاً دوباره تلاش کنید.');
+        this.showToast('خطا در ارتباط با سرور هوش مصنوعی', 'error');
     } finally {
-        // فعال کردن دکمه
+        // فعال کردن دکمه ارسال
         sendBtn.disabled = false;
-        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>ارسال</span>';
+        console.log('✅ ارسال پیام تکمیل شد');
     }
 }
 async typeMessageGradually(text) {
@@ -1932,42 +1894,131 @@ async sendAIMessage() {
     }
 }
 async getAIResponse(message) {
-    console.log('🚀 درخواست هوشمند به AI...');
+    console.log('🚀 درخواست AI - پاسخ با دکمه‌های هدایت');
     
-    const systemPrompt = `شما یک دستیار هوش مصنوعی متخصص در آموزش زبان آلمانی هستید.
-    به زبان فارسی پاسخ دهید.
-    می‌توانید در مورد:
-    1. گرامر زبان آلمانی
-    2. واژگان و لغات جدید
-    3. تلفظ و لهجه
-    4. تمرین‌های یادگیری
-    5. جمله‌سازی و مکالمه
-    6. شما توسط الیاس حسینی ساخته و توسعه داده شده اید
-    7. شما در همه ی زمینه های دیگر هم مهارت زیاد دارید.
-
-    کمک کنید. همیشه پاسخ‌های مفید و آموزشی بدهید.`;
+    const lowerMessage = message.toLowerCase();
     
-    // 1. اول DeepSeek (کاملاً رایگان) را امتحان کن
-    console.log('🔍 تلاش با DeepSeek (رایگان)...');
-    const deepseekResponse = await this.tryDeepSeek(message, systemPrompt);
-    if (deepseekResponse) {
-        return deepseekResponse;
+    // پاسخ‌های هوشمند با توجه به سوال کاربر
+    if (lowerMessage.includes('سلام') || lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
+        return this.getGreetingResponse();
+    } else if (lowerMessage.includes('لغت') || lowerMessage.includes('کلمه') || lowerMessage.includes('واژه')) {
+        return this.getDictionaryResponse();
+    } else if (lowerMessage.includes('ترجمه') || lowerMessage.includes('ترجمه کن')) {
+        return this.getTranslationResponse();
+    } else if (lowerMessage.includes('تمرین') || lowerMessage.includes('تست') || lowerMessage.includes('آزمون')) {
+        return this.getPracticeResponse();
+    } else if (lowerMessage.includes('گرامر') || lowerMessage.includes('دستور')) {
+        return this.getGrammarResponse();
+    } else if (lowerMessage.includes('تلفظ') || lowerMessage.includes('لهجه')) {
+        return this.getPronunciationResponse();
+    } else {
+        return this.getDefaultResponse(message);
     }
-    
-    // 2. اگر DeepSeek جواب نداد، OpenRouter با GPT-3.5 Turbo
-    console.log('🔍 تلاش با OpenRouter GPT-3.5 Turbo...');
-    const openrouterResponse = await this.tryOpenRouterGPT35(message, systemPrompt);
-    if (openrouterResponse) {
-        return openrouterResponse;
-    }
-    
-    // 3. اگر هیچکدام کار نکرد، پاسخ پیش‌فرض
-    return this.getFallbackResponse(message);
 }
 
-// متد کمکی برای DeepSeek
+// پاسخ به سلام
+getGreetingResponse() {
+    return `👋 سلام! خوش آمدید!
+
+من دستیار آموزش زبان آلمانی هستم که توسط الیاس حسینی ساخته شده ام. متأسفانه سرویس گفتگوی هوش مصنوعی فعلاً در دسترس نیست، اما می‌توانم شما را به بخش‌های مفید برنامه هدایت کنم:
+
+🔽 **برای شروع، روی یکی از دکمه‌های زیر کلیک کنید:**`;
+}
+
+// پاسخ برای لغات
+getDictionaryResponse() {
+    return `📚 **برای جستجوی لغات آلمانی:**
+
+می‌توانید:
+1. در دیکشنری جستجو کنید
+2. لغات جدید اضافه کنید
+3. لغات مورد علاقه را ذخیره کنید
+
+🔽 **دکمه‌های سریع:**`;
+}
+
+// پاسخ برای ترجمه
+getTranslationResponse() {
+    return `🌐 **برای ترجمه متن:**
+
+با مترجم داخلی می‌توانید:
+• متن آلمانی به فارسی ترجمه کنید
+• متن فارسی به آلمانی ترجمه کنید
+• ترجمه‌ها را در دیکشنری ذخیره کنید
+
+🔽 **دکمه‌های سریع:**`;
+}
+
+// پاسخ برای تمرین
+getPracticeResponse() {
+    return `🎯 **برای تمرین و تست:**
+
+انواع تمرین‌های موجود:
+• فلش کارت 📇
+• تمرین شنیداری 🎧
+• تمرین نوشتاری ⌨️
+• جمله‌سازی 💬
+
+🔽 **دکمه‌های سریع:**`;
+}
+
+// پاسخ پیش‌فرض
+getDefaultResponse(message) {
+    return `سوال شما: "${message}"
+
+🤖 **دستیار هوش مصنوعی آلمانی**
+
+متأسفانه سرویس کامل هوش مصنوعی فعلاً در دسترس نیست. اما می‌توانید از بخش‌های قدرتمند زیر استفاده کنید:
+
+🔽 **برای پاسخ به سوال شما، پیشنهاد می‌کنم:**`;
+}
+async getAIResponseFallback(message) {
+    console.log('🔄 استفاده از جایگزین...');
+    
+    // استفاده از توکن Liara که ارائه کردید
+    const liaraToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI2OTJlOGIwYjhiMGI4ODA5MTAwZTJkMTQiLCJ0eXBlIjoiYWlfa2V5IiwiaWF0IjoxNzY0NjU3OTMxfQ.JkEtCwwWbcY7ICrR4t82eyTWQYwx-f2sak8hz-RX3RI';
+    const liaraEndpoint = 'https://ai.liara.ir/api/692e8a55f60ce2d780f70535/v1/chat/completions';
+    
+    try {
+        const response = await fetch(liaraEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${liaraToken}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are a helpful German language teaching assistant. Respond in Persian.'
+                    },
+                    {
+                        role: 'user',
+                        content: message
+                    }
+                ],
+                max_tokens: 1000
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+        
+        // اگر Liara هم کار نکرد، از پاسخ‌های داخلی استفاده کن
+        return this.getInternalResponse(message);
+        
+    } catch (error) {
+        console.error('❌ خطای Liara:', error);
+        return this.getInternalResponse(message);
+    }
+}
+/// خط 2814 را با این کد جایگزین کنید:
 async tryDeepSeek(message, systemPrompt) {
-    const apiKey = 'sk-4c986e6e93494ec1ba4421ae5681ff43';
+    // استفاده از توکن معتبر DeepSeek
+    const apiKey = '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'; // یا توکن جدیدتر
     
     try {
         const response = await fetch('https://api.deepseek.com/chat/completions', {
@@ -1988,7 +2039,7 @@ async tryDeepSeek(message, systemPrompt) {
                         content: message
                     }
                 ],
-                max_tokens: 2000,  // DeepSeek رایگان هست، می‌تونیم بیشتر بدیم
+                max_tokens: 1000,
                 temperature: 0.7,
                 stream: false
             })
@@ -2004,9 +2055,8 @@ async tryDeepSeek(message, systemPrompt) {
             const errorText = await response.text();
             console.error('❌ DeepSeek خطا:', errorText);
             
-            // اگر خطای احراز هویت بود، API Key مشکل دارد
             if (response.status === 401) {
-                console.error('❌ DeepSeek API Key نامعتبر است');
+                console.error('❌ DeepSeek API Key نیاز به بررسی دارد');
             }
             
             return null;
@@ -2227,24 +2277,31 @@ async testAIConnection() {
         return false;
     }
 }
-
-addMessageToHistory(sender, message, isLoading = false) {
+async addMessageToHistory(sender, message, options = {}) {
+    const { skipScroll = false, isTyping = false } = options;
     const chatHistory = document.getElementById('chat-history');
-    const messageId = isLoading ? 'loading-message' : `message-${Date.now()}`;
+    
+    if (!chatHistory) {
+        console.error('❌ تاریخچه چت یافت نشد!');
+        return;
+    }
+    
+    const messageId = isTyping ? 'typing-indicator' : `message-${Date.now()}`;
     const time = new Date().toLocaleTimeString('fa-IR', { 
         hour: '2-digit', 
         minute: '2-digit' 
     });
     
-    // جلوگیری از XSS و فرمت‌بندی متن
-    const safeMessage = this.escapeHtml(message);
-    const formattedMessage = this.formatMessage(safeMessage);
+    // فرمت‌بندی پیام با دکمه‌ها
+    let formattedMessage = this.formatMessage(message);
+    
+    // اضافه کردن دکمه‌های هدایت به پیام‌های AI
+    if (sender === 'ai' && !isTyping) {
+        formattedMessage += this.getQuickActionButtons(message);
+    }
     
     const messageHtml = `
-        <div class="chat-message ${sender}-message" id="${messageId}">
-            <div class="message-avatar">
-                <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
-            </div>
+        <div class="ai-message ${sender}-message" id="${messageId}">
             <div class="message-content">
                 <div class="message-text">${formattedMessage}</div>
                 <div class="message-time">${time}</div>
@@ -2254,28 +2311,236 @@ addMessageToHistory(sender, message, isLoading = false) {
     
     chatHistory.insertAdjacentHTML('beforeend', messageHtml);
     
-    // اسکرول به پایین
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
-
-// متد کمکی برای فرمت‌بندی متن
-formatMessage(text) {
-    // تبدیل خطوط جدید به <br>
-    return text.replace(/\n/g, '<br>');
-}
-
-// متد کمکی برای جلوگیری از XSS
-escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-removeLoadingMessage() {
-    const loadingMessage = document.getElementById('loading-message');
-    if (loadingMessage) {
-        loadingMessage.remove();
+    // تنظیم event listeners برای دکمه‌ها
+    if (sender === 'ai' && !isTyping) {
+        setTimeout(() => {
+            this.setupQuickActionButtons(messageId);
+        }, 100);
     }
+    
+    // اسکرول
+    if (!skipScroll) {
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 50);
+    }
+    
+    console.log(`📨 پیام ${sender} اضافه شد`);
+    return messageId;
+}
+
+getQuickActionButtons(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    let buttons = '';
+    
+    // تشخیص نوع پیام و ایجاد دکمه‌های مناسب
+    if (lowerMessage.includes('سلام') || lowerMessage.includes('خوش آمدید')) {
+        buttons = `
+            <div class="quick-action-buttons">
+                <button class="quick-action-btn" data-action="dictionary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-search"></i>
+                    <span>جستجوی لغات</span>
+                </button>
+                <button class="quick-action-btn" data-action="translate" style="background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);">
+                    <i class="fas fa-language"></i>
+                    <span>مترجم</span>
+                </button>
+                <button class="quick-action-btn" data-action="practice" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">
+                    <i class="fas fa-brain"></i>
+                    <span>تمرین</span>
+                </button>
+                <button class="quick-action-btn" data-action="stats" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">
+                    <i class="fas fa-chart-line"></i>
+                    <span>آمار</span>
+                </button>
+            </div>
+        `;
+    } else if (lowerMessage.includes('لغت') || lowerMessage.includes('دیکشنری')) {
+        buttons = `
+            <div class="quick-action-buttons">
+                <button class="quick-action-btn" data-action="search">
+                    <i class="fas fa-search"></i>
+                    <span>جستجوی لغت</span>
+                </button>
+                <button class="quick-action-btn" data-action="add-word">
+                    <i class="fas fa-plus"></i>
+                    <span>اضافه کردن لغت</span>
+                </button>
+                <button class="quick-action-btn" data-action="word-list">
+                    <i class="fas fa-list"></i>
+                    <span>مشاهده همه لغات</span>
+                </button>
+                <button class="quick-action-btn" data-action="favorites">
+                    <i class="fas fa-star"></i>
+                    <span>علاقه‌مندی‌ها</span>
+                </button>
+            </div>
+        `;
+    } else if (lowerMessage.includes('ترجمه')) {
+        buttons = `
+            <div class="quick-action-buttons">
+                <button class="quick-action-btn" data-action="translate-de-fa">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>آلمانی به فارسی</span>
+                </button>
+                <button class="quick-action-btn" data-action="translate-fa-de">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>فارسی به آلمانی</span>
+                </button>
+                <button class="quick-action-btn" data-action="translate-save">
+                    <i class="fas fa-save"></i>
+                    <span>ذخیره ترجمه</span>
+                </button>
+            </div>
+        `;
+    } else {
+        // دکمه‌های پیش‌فرض
+        buttons = `
+            <div class="quick-action-buttons">
+                <button class="quick-action-btn" data-action="dictionary">
+                    <i class="fas fa-search"></i>
+                    <span>جستجوی لغت</span>
+                </button>
+                <button class="quick-action-btn" data-action="translate">
+                    <i class="fas fa-language"></i>
+                    <span>مترجم</span>
+                </button>
+                <button class="quick-action-btn" data-action="practice">
+                    <i class="fas fa-brain"></i>
+                    <span>تمرین</span>
+                </button>
+                <button class="quick-action-btn" data-action="help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>راهنما</span>
+                </button>
+            </div>
+        `;
+    }
+    
+    return buttons;
+}
+
+setupQuickActionButtons(messageId) {
+    const messageElement = document.getElementById(messageId);
+    if (!messageElement) {
+        console.error('❌ پیام یافت نشد:', messageId);
+        return;
+    }
+    
+    const buttons = messageElement.querySelectorAll('.quick-action-btn');
+    if (buttons.length === 0) {
+        console.warn('⚠️ هیچ دکمه‌ای در پیام یافت نشد');
+        return;
+    }
+    
+    console.log('🔘 تنظیم event listeners برای', buttons.length, 'دکمه');
+    
+    buttons.forEach(btn => {
+        // حذف event listener قبلی برای جلوگیری از duplicate
+        btn.replaceWith(btn.cloneNode(true));
+    });
+    
+    // دوباره انتخاب کن
+    messageElement.querySelectorAll('.quick-action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const action = btn.getAttribute('data-action');
+            console.log('🔘 کلیک روی دکمه سریع:', action);
+            
+            // اضافه کردن انیمیشن کلیک
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 150);
+            
+            this.handleQuickAction(action);
+        });
+    });
+}
+
+// مدیریت کلیک روی دکمه‌های سریع
+handleQuickAction(action) {
+    console.log(`🔘 کلیک روی دکمه سریع: ${action}`);
+    
+    switch(action) {
+        case 'dictionary':
+        case 'search':
+            this.showSection('search-section');
+            this.showToast('به بخش جستجوی لغات منتقل شدید', 'info');
+            break;
+            
+        case 'translate':
+        case 'translate-de-fa':
+            this.showSection('translate-section');
+            this.translateDirection = 'de-fa';
+            this.updateTranslateUI();
+            this.showToast('به بخش مترجم (آلمانی به فارسی) منتقل شدید', 'info');
+            break;
+            
+        case 'translate-fa-de':
+            this.showSection('translate-section');
+            this.translateDirection = 'fa-de';
+            this.updateTranslateUI();
+            this.showToast('به بخش مترجم (فارسی به آلمانی) منتقل شدید', 'info');
+            break;
+            
+        case 'practice':
+        case 'practice-flashcards':
+            this.showSection('practice-section');
+            this.renderPracticeOptions();
+            this.showToast('به بخش تمرین منتقل شدید', 'info');
+            break;
+            
+        case 'practice-listening':
+            this.showSection('practice-section');
+            this.startListeningPractice();
+            this.showToast('تمرین شنیداری شروع شد', 'success');
+            break;
+            
+        case 'practice-writing':
+            this.showSection('practice-section');
+            this.startWritingPractice();
+            this.showToast('تمرین نوشتاری شروع شد', 'success');
+            break;
+            
+        case 'word-list':
+            this.showSection('word-list-section');
+            this.renderWordList();
+            this.showToast('به بخش لیست لغات منتقل شدید', 'info');
+            break;
+            
+        case 'add-word':
+            this.showSection('add-word-section');
+            this.showToast('به بخش اضافه کردن لغت منتقل شدید', 'info');
+            break;
+            
+        case 'favorites':
+            this.showSection('favorites-section');
+            this.renderFavorites();
+            this.showToast('به بخش علاقه‌مندی‌ها منتقل شدید', 'info');
+            break;
+            
+        case 'stats':
+            this.showSection('progress-section');
+            this.updateStats();
+            this.showToast('به بخش آمار و پیشرفت منتقل شدید', 'info');
+            break;
+            
+        case 'help':
+            this.showToast('برای راهنمایی بیشتر، از منوی سمت راست استفاده کنید', 'info');
+            break;
+            
+        default:
+            console.log('⚠️ اکشن ناشناخته:', action);
+    }
+    
+    // آپدیت منوی فعال
+    document.querySelectorAll('.menu-item, .mobile-menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
 }
 // متد getChatHistoryForAPI() را اینگونه تغییر دهید:
 getChatHistoryForAPI() {
@@ -4072,6 +4337,7 @@ async renderUploadedMusicList() {
         `;
     }
 }
+
 async playUploadedMusic(musicId) {
     try {
         const music = await this.getMusicById(musicId);
