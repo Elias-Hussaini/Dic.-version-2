@@ -4337,7 +4337,6 @@ async renderUploadedMusicList() {
         `;
     }
 }
-
 async playUploadedMusic(musicId) {
     try {
         const music = await this.getMusicById(musicId);
