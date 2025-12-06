@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(reg => console.log('Service Worker registered', reg))
           .catch(err => console.log('Service Worker registration failed', err));
       }
+      
     }
 
     initDB() {
@@ -3321,40 +3322,33 @@ setupTranslateEventListeners() {
     });
     
     // ترجمه اتوماتیک با تایپ کردن
-    document.getElementById('translate-input')?.addEventListener('input', (e) => {
-        clearTimeout(debounceTimer);
+   document.getElementById('translate-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        
         const text = e.target.value.trim();
+        if (!text) return;
         
-        if (!text) {
-            document.getElementById('translate-result').innerHTML = `
-                <div class="empty-result">
-                    <div class="empty-icon">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <p>نتیجه ترجمه اینجا نمایش داده می‌شود</p>
-                    <small>متن را در باکس بالا وارد کنید</small>
-                </div>
-            `;
-            document.getElementById('suggestions-list').innerHTML = '';
-            return;
-        }
+        // **قبل از ترجمه: ذخیره موقعیت دقیق**
+        const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        const currentFocus = document.activeElement;
         
-        // نمایش در حال ترجمه
-        document.getElementById('translate-result').innerHTML = `
-            <div class="loading-translation">
-                <div class="spinner"></div>
-                <p>در حال ترجمه...</p>
-            </div>
-        `;
-        
-        // جستجوی پیشنهادی
-        this.showSuggestions(text);
-        
-        // ترجمه اصلی با تاخیر
-        debounceTimer = setTimeout(async () => {
-            await this.performAutoTranslation(text);
-        }, 600);
-    });
+        // **از setTimeout با delay کم استفاده کن تا render شدن صفحه کامل شود**
+        setTimeout(() => {
+            this.performAutoTranslation(text);
+            
+            // **بعد از ترجمه: مطمئن شو اسکرول تغییر نکرده**
+            setTimeout(() => {
+                window.scrollTo(0, currentScrollPosition);
+                
+                // **فوکوس را برگردان**
+                if (currentFocus && currentFocus.tagName === 'TEXTAREA') {
+                    currentFocus.focus();
+                }
+            }, 300);
+        }, 10);
+    }
+});
     // در متد setupTranslateEventListeners()، این کد را اضافه کنید:
 
 // مدیریت Enter در مترجم
@@ -3761,12 +3755,19 @@ updateTranslateUI() {
 async performAutoTranslation(text) {
     const resultDiv = document.getElementById('translate-result');
     
-    // نمایش وضعیت در حال ترجمه
+    // **1. جلوگیری کامل از هرگونه اسکرول در این متد**
+    // ذخیره موقعیت فعلی
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // **2. جلوگیری از focus روی المان‌های دیگر**
+    const activeElement = document.activeElement;
+    const translateInput = document.getElementById('translate-input');
+    
+    // نمایش وضعیت در حال ترجمه - بدون تغییر layout
     resultDiv.innerHTML = `
-        <div class="loading-translation">
+        <div class="loading-translation" style="min-height: 120px;">
             <div class="spinner"></div>
-            <p>در حال ترجمه آنلاین...</p>
-            <small>لطفاً صبر کنید</small>
+            <p>در حال ترجمه...</p>
         </div>
     `;
     
@@ -3781,7 +3782,7 @@ async performAutoTranslation(text) {
             // اگر در دیتابیس محلی پیدا شد
             translatedText = localResult;
             resultDiv.innerHTML = `
-                <div class="translated-text">
+                <div class="translated-text" style="opacity: 0; transition: opacity 0.3s ease;">
                     <div class="result-text">
                         <p style="font-size: 18px; font-weight: 500; color: #27ae60;">${translatedText}</p>
                     </div>
@@ -3797,7 +3798,7 @@ async performAutoTranslation(text) {
             
             if (translatedText) {
                 resultDiv.innerHTML = `
-                    <div class="translated-text">
+                    <div class="translated-text" style="opacity: 0; transition: opacity 0.3s ease;">
                         <div class="original-text">
                             <small>متن اصلی:</small>
                             <p>${text}</p>
@@ -3816,8 +3817,6 @@ async performAutoTranslation(text) {
                     </div>
                 `;
                 
-              
-                
                 // اضافه کردن event listener برای ذخیره
                 document.getElementById('save-online-translation-btn')?.addEventListener('click', () => {
                     this.saveOnlineTranslation(text, translatedText);
@@ -3826,31 +3825,135 @@ async performAutoTranslation(text) {
             } else {
                 // اگر ترجمه آنلاین هم موفق نبود
                 resultDiv.innerHTML = `
-                    <div class="not-found-message">
+                    <div class="not-found-message" style="opacity: 0; transition: opacity 0.3s ease;">
                         <i class="fas fa-exclamation-triangle"></i>
                         <p>ترجمه یافت نشد</p>
                         <small>مشکلی در ارتباط با سرور ترجمه پیش آمده</small>
-                        <br>
-                        <small>مطمئن شوید به اینترنت متصل هستید</small>
                     </div>
                 `;
             }
         }
         
+        // **3. فیدبک بصری بدون اسکرول**
+        setTimeout(() => {
+            // نمایش تدریجی نتیجه
+            const translatedElement = resultDiv.querySelector('.translated-text, .not-found-message, .error-message');
+            if (translatedElement) {
+                translatedElement.style.opacity = '1';
+            }
+            
+            // **مهم: موقعیت اسکرول را حفظ کن**
+            requestAnimationFrame(() => {
+                window.scrollTo(0, scrollPosition);
+            });
+            
+            // **فوکوس را به فیلد ورودی برگردان (اگر از دست رفته)**
+            if (document.activeElement !== translateInput && translateInput) {
+                translateInput.focus();
+            }
+            
+        }, 50);
+        
     } catch (error) {
         console.error('Auto translation error:', error);
         resultDiv.innerHTML = `
-            <div class="error-message">
+            <div class="error-message" style="opacity: 0; transition: opacity 0.3s ease;">
                 <i class="fas fa-exclamation-triangle"></i>
                 <p>خطا در ترجمه</p>
                 <small>${error.message || 'مشکلی در پردازش پیش آمده'}</small>
-                <br>
-                <button class="btn btn-sm btn-outline mt-2" onclick="location.reload()">
-                    <i class="fas fa-redo"></i> تلاش مجدد
-                </button>
             </div>
         `;
+        
+        setTimeout(() => {
+            const errorElement = resultDiv.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.style.opacity = '1';
+            }
+            // حفظ موقعیت اسکرول
+            window.scrollTo(0, scrollPosition);
+        }, 50);
     }
+    
+    // **4. بلافاصله موقعیت اسکرول را برگردان (حتی قبل از پایان ترجمه)**
+    requestAnimationFrame(() => {
+        window.scrollTo({
+            top: scrollPosition,
+            behavior: 'auto' // بدون انیمیشن
+        });
+    });
+    
+    // **5. همچنین بعد از 100ms دوباره چک کن**
+    setTimeout(() => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        if (Math.abs(currentScroll - scrollPosition) > 10) {
+            window.scrollTo(0, scrollPosition);
+        }
+    }, 100);
+}
+
+// **متد جدید برای مدیریت Enter کلی بدون جابجایی فوکوس**
+setupGlobalEnterListener() {
+    // حذف listener قبلی اگر وجود دارد
+    if (this.globalEnterHandler) {
+        document.removeEventListener('keydown', this.globalEnterHandler);
+    }
+    
+    this.globalEnterHandler = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+            const saveBtn = document.getElementById('save-translation');
+            const translateInput = document.getElementById('translate-input');
+            
+            // فقط اگر ترجمه کامل شده و کاربر در فیلد ورودی است
+            if (saveBtn && translateInput && 
+                document.activeElement === translateInput &&
+                this.translationCompleted) {
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // ذخیره را انجام بده
+                this.saveTranslationWithAutoAnalysis();
+                
+                // حذف listener
+                document.removeEventListener('keydown', this.globalEnterHandler);
+                this.globalEnterHandler = null;
+                
+                // بازگرداندن دکمه به حالت عادی
+                saveBtn.innerHTML = '<i class="fas fa-magic"></i> ذخیره هوشمند';
+                saveBtn.classList.remove('translation-ready');
+                
+                // پاک کردن فیلد ورودی
+                translateInput.value = '';
+                this.translationCompleted = false;
+            }
+        }
+    };
+    
+    document.addEventListener('keydown', this.globalEnterHandler);
+}
+
+// **متد جدید برای ریست کردن وضعیت وقتی متن تغییر می‌کند**
+setupTranslateInputMonitoring() {
+    const translateInput = document.getElementById('translate-input');
+    if (!translateInput) return;
+    
+    translateInput.addEventListener('input', () => {
+        if (this.translationCompleted) {
+            this.translationCompleted = false;
+            
+            const saveBtn = document.getElementById('save-translation');
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-magic"></i> ذخیره هوشمند';
+                saveBtn.classList.remove('translation-ready');
+            }
+            
+            // حذف listener اگر وجود دارد
+            if (this.globalEnterHandler) {
+                document.removeEventListener('keydown', this.globalEnterHandler);
+                this.globalEnterHandler = null;
+            }
+        }
+    });
 }
 
 // متد جدید برای ذخیره ترجمه آنلاین
