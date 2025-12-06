@@ -1228,7 +1228,364 @@ resetVoiceSettings() {
     this.showToast('تنظیمات صدا بازنشانی شد', 'info');
     this.setupScrollManagement();
 }
+// =====================
+// AUTO WORD ANALYSIS
+// =====================
 
+// شناسایی خودکار نوع کلمه و جنسیت
+async autoDetectWordInfo(germanWord) {
+    const word = germanWord.toLowerCase().trim();
+    
+    // اطلاعات اولیه
+    let type = 'other';
+    let gender = null;
+    
+    // 1. شناسایی اسم و جنسیت آن
+    const genderPatterns = {
+        masculine: [
+            // پسوندهای مذکر
+            /(ling|ich|ig|ner|ismus|or|ant|ent|ist)$/,
+            // ماه‌ها، روزها، فصل‌ها
+            /^(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)$/,
+            /^(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)$/,
+            /^(frühling|sommer|herbst|winter)$/,
+            // جهات
+            /^(norden|süden|osten|westen)$/
+        ],
+        feminine: [
+            // پسوندهای مونث
+            /(ung|heit|keit|schaft|ion|tät|ik|ur|ei|enz|anz|ade|age|isse|itis|ive|sis|os)$/,
+            // اعداد
+            /^(eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn)$/,
+            // کشتی‌ها، هواپیماها
+            /schiff$/,
+            /maschine$/
+        ],
+        neuter: [
+            // پسوندهای خنثی
+            /(chen|lein|ment|tum|um|ma|nis|sal|tel|in|icht|sel)$/,
+            // حروف الفبا
+            /^[a-z]$/,
+            // عناصر شیمیایی
+            /^(sauerstoff|wasserstoff|stickstoff|kohlenstoff)$/,
+            // فلزات
+            /^(gold|silber|eisen|kupfer|blei)$/
+        ]
+    };
+    
+    // بررسی برای شناسایی اسم
+    const isNoun = /^[A-ZÄÖÜ][a-zäöüß]+$/.test(germanWord) || 
+                  germanWord.includes(' ') || 
+                  this.checkIfNoun(word);
+    
+    if (isNoun) {
+        type = 'noun';
+        
+        // تشخیص جنسیت بر اساس الگوها
+        for (const [gen, patterns] of Object.entries(genderPatterns)) {
+            for (const pattern of patterns) {
+                if (pattern.test(word)) {
+                    gender = gen;
+                    break;
+                }
+            }
+            if (gender) break;
+        }
+        
+        // تشخیص جنسیت بر اساس معنی (کلمات شناخته شده)
+        const knownNouns = {
+            masculine: [
+                'mann', 'junge', 'vater', 'sohn', 'bruder', 'onkel', 'opa',
+                'hund', 'kater', 'baum', 'stuhl', 'tisch', 'computer', 'buch',
+                'apfel', 'ball', 'film', 'park', 'flughafen', 'bahnhof'
+            ],
+            feminine: [
+                'frau', 'mutter', 'tochter', 'schwester', 'tante', 'oma',
+                'katze', 'blume', 'schule', 'universität', 'stadt', 'land',
+                'zeitung', 'zeitschrift', 'uhr', 'tasche', 'hand', 'nase'
+            ],
+            neuter: [
+                'kind', 'mädchen', 'baby', 'haus', 'auto', 'buch', 'bett',
+                'fenster', 'tor', 'radio', 'video', 'kino', 'museum', 'hotel',
+                'restaurant', 'café', 'bier', 'wasser', 'brot', 'ei'
+            ]
+        };
+        
+        if (!gender) {
+            for (const [gen, words] of Object.entries(knownNouns)) {
+                if (words.includes(word)) {
+                    gender = gen;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // 2. شناسایی فعل
+    else if (this.checkIfVerb(word)) {
+        type = 'verb';
+    }
+    
+    // 3. شناسایی صفت
+    else if (this.checkIfAdjective(word)) {
+        type = 'adjective';
+    }
+    
+    // 4. شناسایی قید
+    else if (this.checkIfAdverb(word)) {
+        type = 'adverb';
+    }
+    
+    return { type, gender };
+}
+
+// بررسی اسم بودن
+checkIfNoun(word) {
+    const nounIndicators = [
+        // پسوندهای اسم
+        /(ung|heit|keit|schaft|ling|chen|lein|tum|nis|sal|ment)$/,
+        // شروع با حرف بزرگ (در متن)
+        /^[A-ZÄÖÜ]/,
+        // ترکیب با حرف تعریف
+        /\b(der|die|das|ein|eine|einen|einem|einer)\s+\w+/i
+    ];
+    
+    return nounIndicators.some(pattern => pattern.test(word));
+}
+
+// بررسی فعل بودن
+checkIfVerb(word) {
+    const verbIndicators = [
+        // پسوندهای فعل
+        /(en|ern|eln|ieren|isieren|ifizieren)$/,
+        // پیشوندهای جدا شدنی
+        /^(ab|an|auf|aus|bei|ein|mit|nach|vor|zu|her|hin|weg|zurück)/,
+        // صرف فعل متداول
+        /\b(ist|sind|war|waren|hat|haben|wird|werden|kann|können|muss|müssen|darf|dürfen|soll|sollen|will|wollen|mag|mögen)\b/i
+    ];
+    
+    return verbIndicators.some(pattern => pattern.test(word));
+}
+
+// بررسی صفت بودن
+checkIfAdjective(word) {
+    const adjectiveIndicators = [
+        // پسوندهای صفت
+        /(ig|isch|lich|bar|sam|haft|los|voll|mäßig|artig)$/,
+        // درجه مقایسه
+        /(er|est)$/,
+        // صفات متداول
+        /\b(gut|schlecht|groß|klein|alt|neu|jung|alt|schön|hässlich|schnell|langsam|stark|schwach|teuer|billig|leicht|schwer|warm|kalt|hell|dunkel)\b/i
+    ];
+    
+    return adjectiveIndicators.some(pattern => pattern.test(word));
+}
+
+// بررسی قید بودن
+checkIfAdverb(word) {
+    const adverbIndicators = [
+        // پسوندهای قید
+        /(weise|lings|mal|falls|halber)$/,
+        // قیدهای متداول
+        /\b(hier|dort|da|oben|unten|vorne|hinten|links|rechts|heute|gestern|morgen|oft|manchmal|selten|nie|immer|jetzt|gleich|bald|spät|früh|sehr|ziemlich|ganz|fast|kaum|eben|doch|denn|auch|nur|noch|schon|noch|nicht)\b/i
+    ];
+    
+    return adverbIndicators.some(pattern => pattern.test(word));
+}
+
+// پیشنهاد صرف فعل
+suggestVerbConjugation(verb) {
+    const conjugations = {
+        present: verb,
+        past: '',
+        perfect: ''
+    };
+    
+    // الگوهای متداول صرف فعل آلمانی
+    if (verb.endsWith('en')) {
+        const stem = verb.slice(0, -2);
+        
+        // فعل‌های منظم
+        conjugations.past = stem + 'te';
+        conjugations.perfect = 'ge' + stem + 't';
+        
+        // استثناهای خاص
+        const irregularVerbs = {
+            'sein': { past: 'war', perfect: 'gewesen' },
+            'haben': { past: 'hatte', perfect: 'gehabt' },
+            'werden': { past: 'wurde', perfect: 'geworden' },
+            'können': { past: 'konnte', perfect: 'gekonnt' },
+            'müssen': { past: 'musste', perfect: 'gemusst' },
+            'dürfen': { past: 'durfte', perfect: 'gedurft' },
+            'sollen': { past: 'sollte', perfect: 'gesollt' },
+            'wollen': { past: 'wollte', perfect: 'gewollt' },
+            'mögen': { past: 'mochte', perfect: 'gemocht' },
+            'gehen': { past: 'ging', perfect: 'gegangen' },
+            'kommen': { past: 'kam', perfect: 'gekommen' },
+            'sehen': { past: 'sah', perfect: 'gesehen' },
+            'sprechen': { past: 'sprach', perfect: 'gesprochen' },
+            'lesen': { past: 'las', perfect: 'gelesen' },
+            'essen': { past: 'aß', perfect: 'gegessen' },
+            'trinken': { past: 'trank', perfect: 'getrunken' },
+            'schlafen': { past: 'schlief', perfect: 'geschlafen' }
+        };
+        
+        if (irregularVerbs[verb]) {
+            conjugations.past = irregularVerbs[verb].past;
+            conjugations.perfect = irregularVerbs[verb].perfect;
+        }
+    }
+    
+    return conjugations;
+}
+// =====================
+// SMART TRANSLATION SAVE
+// =====================
+
+// ذخیره خودکار از مترجم با تحلیل هوشمند
+async saveTranslationWithAutoAnalysis() {
+    const inputText = document.getElementById('translate-input').value.trim();
+    const resultDiv = document.getElementById('translate-result');
+    
+    if (!inputText) {
+        this.showToast('لطفاً ابتدا متنی را ترجمه کنید', 'warning');
+        return;
+    }
+    
+    // استخراج ترجمه از نتیجه
+    let translationText = '';
+    const resultElements = resultDiv.querySelectorAll('p');
+    
+    for (const element of resultElements) {
+        const text = element.textContent.trim();
+        if (text && 
+            !text.includes('نتیجه ترجمه') && 
+            !text.includes('متن را در باکس') && 
+            !text.includes('در حال ترجمه') &&
+            text !== inputText) {
+            translationText = text;
+            break;
+        }
+    }
+    
+    if (!translationText) {
+        this.showToast('ترجمه‌ای برای ذخیره کردن وجود ندارد', 'warning');
+        return;
+    }
+    
+    // تعیین جهت ترجمه
+    let german, persian;
+    if (this.translateDirection === 'de-fa') {
+        german = inputText;
+        persian = translationText;
+    } else {
+        german = translationText;
+        persian = inputText;
+    }
+    
+    // پاکسازی متن
+    german = german.replace(/["']/g, '').replace(/\s+/g, ' ').trim();
+    persian = persian.replace(/["']/g, '').replace(/\s+/g, ' ').trim();
+    
+    // تحلیل خودکار کلمه آلمانی
+    const analysis = await this.autoDetectWordInfo(german);
+    
+    // نمایش فرم ذخیره با تحلیل خودکار
+    this.showSaveFormWithAnalysis(german, persian, analysis);
+}
+
+// نمایش فرم ذخیره با تحلیل خودکار
+showSaveFormWithAnalysis(german, persian, analysis) {
+    const { type, gender } = analysis;
+    
+    let verbFormsHtml = '';
+    if (type === 'verb') {
+        const conjugations = this.suggestVerbConjugation(german);
+        verbFormsHtml = `
+            <div class="verb-forms-section" id="verb-forms-section">
+                <label>صرف فعل (پیشنهادی):</label>
+                <div class="verb-form-row">
+                    <div class="form-group">
+                        <label for="save-verb-present">حال ساده</label>
+                        <input type="text" id="save-verb-present" class="form-control" value="${conjugations.present}">
+                    </div>
+                    <div class="form-group">
+                        <label for="save-verb-past">گذشته</label>
+                        <input type="text" id="save-verb-past" class="form-control" value="${conjugations.past}">
+                    </div>
+                    <div class="form-group">
+                        <label for="save-verb-perfect">گذشته کامل</label>
+                        <input type="text" id="save-verb-perfect" class="form-control" value="${conjugations.perfect}">
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('add-word-section').innerHTML = `
+        <h2 class="mb-4">📝 ذخیره لغت (تحلیل خودکار)</h2>
+        <div class="word-card">
+            <div class="auto-analysis-banner">
+                <i class="fas fa-robot"></i>
+                <span>تحلیل خودکار انجام شد: <strong>${this.getTypeLabel(type)}</strong> 
+                ${gender ? `- <strong>${this.getGenderLabel(gender)}</strong>` : ''}</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="save-german-word">لغت آلمانی:</label>
+                <input type="text" id="save-german-word" class="form-control" value="${german}">
+            </div>
+            
+            <div class="form-group">
+                <label for="save-persian-meaning">معنی فارسی:</label>
+                <input type="text" id="save-persian-meaning" class="form-control" value="${persian}">
+            </div>
+            
+            <div class="form-group">
+                <label>نوع کلمه:</label>
+                <select id="save-word-type" class="form-control">
+                    <option value="noun" ${type === 'noun' ? 'selected' : ''}>اسم</option>
+                    <option value="verb" ${type === 'verb' ? 'selected' : ''}>فعل</option>
+                    <option value="adjective" ${type === 'adjective' ? 'selected' : ''}>صفت</option>
+                    <option value="adverb" ${type === 'adverb' ? 'selected' : ''}>قید</option>
+                    <option value="other" ${type === 'other' ? 'selected' : ''}>سایر</option>
+                </select>
+            </div>
+            
+            <div class="form-group gender-section" id="gender-section" style="display: ${type === 'noun' ? 'block' : 'none'}">
+                <label>جنسیت (برای اسم‌ها):</label>
+                <div class="gender-options">
+                    <button type="button" class="gender-btn masculine ${gender === 'masculine' ? 'active' : ''}" 
+                            data-gender="masculine">مذکر (der)</button>
+                    <button type="button" class="gender-btn feminine ${gender === 'feminine' ? 'active' : ''}" 
+                            data-gender="feminine">مونث (die)</button>
+                    <button type="button" class="gender-btn neuter ${gender === 'neuter' ? 'active' : ''}" 
+                            data-gender="neuter">خنثی (das)</button>
+                    <button type="button" class="gender-btn none ${!gender ? 'active' : ''}" 
+                            data-gender="none">تعیین نشده</button>
+                </div>
+            </div>
+            
+            ${verbFormsHtml}
+            
+            <div class="action-buttons mt-4">
+                <button class="btn btn-primary" id="save-analyzed-word-btn">
+                    <i class="fas fa-save"></i> ذخیره با تنظیمات پیشنهادی
+                </button>
+                <button class="btn btn-outline" id="cancel-save-analyzed-btn">
+                    <i class="fas fa-times"></i> انصراف
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // تنظیم event listeners
+    this.setupSaveAnalyzedFormEvents();
+    
+    // نمایش بخش
+    this.showSection('add-word-section');
+    document.querySelector('.menu-item[data-section="add-word"]').classList.add('active');
+}
 async sendAIMessage() {
     console.log('🚀 ارسال پیام AI (نسخه ساده)');
     
@@ -3036,10 +3393,9 @@ setupTranslateEventListeners() {
     });
     
     // ذخیره در دیکشنری - این خط را حتماً اضافه کنید
-    document.getElementById('save-translation')?.addEventListener('click', () => {
-        this.saveTranslationAsWord();
-    });
-    
+   document.getElementById('save-translation')?.addEventListener('click', () => {
+    this.saveTranslationWithAutoAnalysis();
+});
     // فوکوس خودکار روی فیلد ورودی
     setTimeout(() => {
         const inputField = document.getElementById('translate-input');
@@ -3047,6 +3403,87 @@ setupTranslateEventListeners() {
             inputField.focus();
         }
     }, 200);
+}
+// تنظیم event listeners برای فرم تحلیل شده
+setupSaveAnalyzedFormEvents() {
+    // تغییر نوع کلمه
+    document.getElementById('save-word-type').addEventListener('change', (e) => {
+        const type = e.target.value;
+        const genderSection = document.getElementById('gender-section');
+        const verbSection = document.getElementById('verb-forms-section');
+        
+        if (type === 'noun') {
+            genderSection.style.display = 'block';
+            if (verbSection) verbSection.style.display = 'none';
+        } else if (type === 'verb') {
+            genderSection.style.display = 'none';
+            if (verbSection) verbSection.style.display = 'block';
+        } else {
+            genderSection.style.display = 'none';
+            if (verbSection) verbSection.style.display = 'none';
+        }
+    });
+    
+    // دکمه‌های جنسیت
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // دکمه ذخیره
+    document.getElementById('save-analyzed-word-btn').addEventListener('click', async () => {
+        const german = document.getElementById('save-german-word').value.trim();
+        const persian = document.getElementById('save-persian-meaning').value.trim();
+        const type = document.getElementById('save-word-type').value;
+        
+        if (!german || !persian) {
+            this.showToast('لطفاً هر دو فیلد لغت و معنی را پر کنید', 'error');
+            return;
+        }
+        
+        const wordData = {
+            german,
+            persian,
+            type
+        };
+        
+        // اضافه کردن جنسیت برای اسم‌ها
+        if (type === 'noun') {
+            const activeGender = document.querySelector('.gender-btn.active');
+            if (activeGender) {
+                const gender = activeGender.getAttribute('data-gender');
+                if (gender !== 'none') {
+                    wordData.gender = gender;
+                }
+            }
+        }
+        
+        // اضافه کردن صرف فعل برای فعل‌ها
+        if (type === 'verb') {
+            const present = document.getElementById('save-verb-present')?.value.trim() || german;
+            const past = document.getElementById('save-verb-past')?.value.trim() || '';
+            const perfect = document.getElementById('save-verb-perfect')?.value.trim() || '';
+            
+            wordData.verbForms = { present, past, perfect };
+        }
+        
+        try {
+            await this.addWord(wordData);
+            this.showToast('✅ لغت با تحلیل خودکار ذخیره شد', 'success');
+            this.renderTranslate();
+            this.showSection('translate-section');
+        } catch (error) {
+            this.showToast('❌ خطا در ذخیره لغت', 'error');
+        }
+    });
+    
+    // دکمه انصراف
+    document.getElementById('cancel-save-analyzed-btn').addEventListener('click', () => {
+        this.renderTranslate();
+        this.showSection('translate-section');
+    });
 }
 // این متد را جایگزین متد قبلی کنید
 async searchInDatabase(text, language) {
@@ -5051,9 +5488,9 @@ renderTranslate() {
                 
                 <div class="action-group">
                     <button class="action-btn save-btn" id="save-translation">
-                        <i class="fas fa-save"></i>
-                        <span>ذخیره در دیکشنری</span>
-                    </button>
+    <i class="fas fa-magic"></i>
+    <span>ذخیره هوشمند</span>
+</button>
                 </div>
             </div>
             
