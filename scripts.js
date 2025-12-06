@@ -1493,12 +1493,12 @@ async saveTranslationWithAutoAnalysis() {
     // نمایش فرم ذخیره با تحلیل خودکار
     this.showSaveFormWithAnalysis(german, persian, analysis);
 }
-
-// نمایش فرم ذخیره با تحلیل خودکار
+// متد showSaveFormWithAnalysis را به این صورت به‌روزرسانی کنید:
 showSaveFormWithAnalysis(german, persian, analysis) {
     const { type, gender } = analysis;
     
     let verbFormsHtml = '';
+    let verbTabIndex = 5;
     if (type === 'verb') {
         const conjugations = this.suggestVerbConjugation(german);
         verbFormsHtml = `
@@ -1507,43 +1507,62 @@ showSaveFormWithAnalysis(german, persian, analysis) {
                 <div class="verb-form-row">
                     <div class="form-group">
                         <label for="save-verb-present">حال ساده</label>
-                        <input type="text" id="save-verb-present" class="form-control" value="${conjugations.present}">
+                        <input type="text" id="save-verb-present" class="form-control" 
+                               value="${conjugations.present}" tabindex="${verbTabIndex++}">
                     </div>
                     <div class="form-group">
                         <label for="save-verb-past">گذشته</label>
-                        <input type="text" id="save-verb-past" class="form-control" value="${conjugations.past}">
+                        <input type="text" id="save-verb-past" class="form-control" 
+                               value="${conjugations.past}" tabindex="${verbTabIndex++}">
                     </div>
                     <div class="form-group">
                         <label for="save-verb-perfect">گذشته کامل</label>
-                        <input type="text" id="save-verb-perfect" class="form-control" value="${conjugations.perfect}">
+                        <input type="text" id="save-verb-perfect" class="form-control" 
+                               value="${conjugations.perfect}" tabindex="${verbTabIndex++}">
                     </div>
                 </div>
             </div>
         `;
     }
     
+    const genderButtonsHtml = `
+        <div class="gender-options">
+            <button type="button" class="gender-btn masculine ${gender === 'masculine' ? 'active' : ''}" 
+                    data-gender="masculine" tabindex="4">مذکر (der)</button>
+            <button type="button" class="gender-btn feminine ${gender === 'feminine' ? 'active' : ''}" 
+                    data-gender="feminine" tabindex="5">مونث (die)</button>
+            <button type="button" class="gender-btn neuter ${gender === 'neuter' ? 'active' : ''}" 
+                    data-gender="neuter" tabindex="6">خنثی (das)</button>
+            <button type="button" class="gender-btn none ${!gender ? 'active' : ''}" 
+                    data-gender="none" tabindex="7">تعیین نشده</button>
+        </div>
+    `;
+    
     document.getElementById('add-word-section').innerHTML = `
         <h2 class="mb-4">📝 ذخیره لغت (تحلیل خودکار)</h2>
-        <div class="word-card">
+        <div class="word-card" id="smart-save-form">
             <div class="auto-analysis-banner">
                 <i class="fas fa-robot"></i>
                 <span>تحلیل خودکار انجام شد: <strong>${this.getTypeLabel(type)}</strong> 
                 ${gender ? `- <strong>${this.getGenderLabel(gender)}</strong>` : ''}</span>
+                <small class="d-block mt-1">از کلید Enter برای پیمایش سریع استفاده کنید</small>
             </div>
             
             <div class="form-group">
                 <label for="save-german-word">لغت آلمانی:</label>
-                <input type="text" id="save-german-word" class="form-control" value="${german}">
+                <input type="text" id="save-german-word" class="form-control" 
+                       value="${german}" tabindex="1">
             </div>
             
             <div class="form-group">
                 <label for="save-persian-meaning">معنی فارسی:</label>
-                <input type="text" id="save-persian-meaning" class="form-control" value="${persian}">
+                <input type="text" id="save-persian-meaning" class="form-control" 
+                       value="${persian}" tabindex="2">
             </div>
             
             <div class="form-group">
-                <label>نوع کلمه:</label>
-                <select id="save-word-type" class="form-control">
+                <label for="save-word-type">نوع کلمه:</label>
+                <select id="save-word-type" class="form-control" tabindex="3">
                     <option value="noun" ${type === 'noun' ? 'selected' : ''}>اسم</option>
                     <option value="verb" ${type === 'verb' ? 'selected' : ''}>فعل</option>
                     <option value="adjective" ${type === 'adjective' ? 'selected' : ''}>صفت</option>
@@ -1552,35 +1571,41 @@ showSaveFormWithAnalysis(german, persian, analysis) {
                 </select>
             </div>
             
-            <div class="form-group gender-section" id="gender-section" style="display: ${type === 'noun' ? 'block' : 'none'}">
+            <div class="form-group gender-section" id="gender-section" 
+                 style="display: ${type === 'noun' ? 'block' : 'none'}">
                 <label>جنسیت (برای اسم‌ها):</label>
-                <div class="gender-options">
-                    <button type="button" class="gender-btn masculine ${gender === 'masculine' ? 'active' : ''}" 
-                            data-gender="masculine">مذکر (der)</button>
-                    <button type="button" class="gender-btn feminine ${gender === 'feminine' ? 'active' : ''}" 
-                            data-gender="feminine">مونث (die)</button>
-                    <button type="button" class="gender-btn neuter ${gender === 'neuter' ? 'active' : ''}" 
-                            data-gender="neuter">خنثی (das)</button>
-                    <button type="button" class="gender-btn none ${!gender ? 'active' : ''}" 
-                            data-gender="none">تعیین نشده</button>
-                </div>
+                ${genderButtonsHtml}
             </div>
             
             ${verbFormsHtml}
             
             <div class="action-buttons mt-4">
-                <button class="btn btn-primary" id="save-analyzed-word-btn">
-                    <i class="fas fa-save"></i> ذخیره با تنظیمات پیشنهادی
+                <button class="btn btn-primary" id="save-analyzed-word-btn" tabindex="${verbTabIndex + 1}">
+                    <i class="fas fa-save"></i> ذخیره نهایی (Enter)
                 </button>
-                <button class="btn btn-outline" id="cancel-save-analyzed-btn">
-                    <i class="fas fa-times"></i> انصراف
+                <button class="btn btn-outline" id="cancel-save-analyzed-btn" tabindex="${verbTabIndex + 2}">
+                    <i class="fas fa-times"></i> انصراف (Esc)
                 </button>
+            </div>
+            
+            <div class="keyboard-hints mt-3">
+                <small><i class="fas fa-keyboard"></i> راهنمای کلیدها: 
+                <kbd>Enter</kbd> = تایید/ادامه | 
+                <kbd>Tab</kbd> = پیمایش | 
+                <kbd>Esc</kbd> = انصراف</small>
             </div>
         </div>
     `;
     
     // تنظیم event listeners
     this.setupSaveAnalyzedFormEvents();
+    
+    // مدیریت کلید Esc برای انصراف
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.getElementById('cancel-save-analyzed-btn').click();
+        }
+    });
     
     // نمایش بخش
     this.showSection('add-word-section');
@@ -3330,7 +3355,49 @@ setupTranslateEventListeners() {
             await this.performAutoTranslation(text);
         }, 600);
     });
+    // در متد setupTranslateEventListeners()، این کد را اضافه کنید:
+
+// مدیریت Enter در مترجم
+document.getElementById('translate-input')?.addEventListener('keydown', (e) => {
+    // اگر Ctrl+Enter زده شد، دکمه ذخیره هوشمند فعال شود
+    if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        document.getElementById('save-translation').click();
+    }
+    // اگر فقط Enter زده شد و متن وجود دارد
+    else if (e.key === 'Enter' && !e.shiftKey) {
+        const text = e.target.value.trim();
+        if (text.length > 0) {
+            // اجازه دهید ترجمه انجام شود
+            setTimeout(() => {
+                // فوکوس را به دکمه ذخیره هوشمند ببر
+                document.getElementById('save-translation').focus();
+            }, 500);
+        }
+    }
+});
+
+// فوکوس خودکار روی دکمه ذخیره پس از ترجمه
+const originalPerformAutoTranslation = this.performAutoTranslation.bind(this);
+this.performAutoTranslation = async function(text) {
+    const result = await originalPerformAutoTranslation(text);
     
+    // پس از ترجمه، دکمه ذخیره را هایلایت کن
+    setTimeout(() => {
+        const saveBtn = document.getElementById('save-translation');
+        if (saveBtn && text.trim().length > 0) {
+            saveBtn.style.animation = 'pulse 1.5s infinite';
+            saveBtn.focus();
+            
+            // بعد از 5 ثانیه انیمیشن را متوقف کن
+            setTimeout(() => {
+                saveBtn.style.animation = '';
+            }, 5000);
+        }
+    }, 1000);
+    
+    return result;
+};
     // دکمه پاک کردن
     document.getElementById('clear-input')?.addEventListener('click', () => {
         document.getElementById('translate-input').value = '';
@@ -3484,6 +3551,150 @@ setupSaveAnalyzedFormEvents() {
         this.renderTranslate();
         this.showSection('translate-section');
     });
+    // در متد setupSaveAnalyzedFormEvents()، این کدها را اضافه کنید:
+
+// مدیریت Enter در فرم ذخیره هوشمند
+const setupEnterNavigation = () => {
+    const form = document.getElementById('add-word-section');
+    if (!form) return;
+    
+    // فوکوس روی اولین فیلد
+    setTimeout(() => {
+        const germanInput = document.getElementById('save-german-word');
+        if (germanInput) {
+            germanInput.focus();
+            germanInput.select();
+        }
+    }, 300);
+    
+    // مدیریت Enter در فیلد آلمانی
+    document.getElementById('save-german-word')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-persian-meaning').focus();
+            document.getElementById('save-persian-meaning').select();
+        }
+    });
+    
+    // مدیریت Enter در فیلد فارسی
+    document.getElementById('save-persian-meaning')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            // بر اساس نوع کلمه، به بخش مناسب برو
+            const type = document.getElementById('save-word-type').value;
+            if (type === 'noun') {
+                // به اولین دکمه جنسیت برو
+                const firstGenderBtn = document.querySelector('.gender-btn');
+                if (firstGenderBtn) {
+                    firstGenderBtn.focus();
+                } else {
+                    document.getElementById('save-analyzed-word-btn').focus();
+                }
+            } else if (type === 'verb') {
+                // به فیلد صرف فعل برو
+                const verbPresent = document.getElementById('save-verb-present');
+                if (verbPresent) {
+                    verbPresent.focus();
+                    verbPresent.select();
+                } else {
+                    document.getElementById('save-analyzed-word-btn').focus();
+                }
+            } else {
+                document.getElementById('save-analyzed-word-btn').focus();
+            }
+        }
+    });
+    
+    // مدیریت Enter در دکمه‌های جنسیت
+    document.querySelectorAll('.gender-btn').forEach((btn, index) => {
+        btn.setAttribute('tabindex', index + 3);
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btn.click();
+                // بعد از انتخاب جنسیت، به دکمه ذخیره برو
+                setTimeout(() => {
+                    document.getElementById('save-analyzed-word-btn').focus();
+                }, 100);
+            }
+            
+            // پیمایش با کلیدهای جهت‌دار
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const currentIndex = parseInt(btn.getAttribute('tabindex'));
+                const direction = e.key === 'ArrowRight' ? 1 : -1;
+                const nextBtn = document.querySelector(`.gender-btn[tabindex="${currentIndex + direction}"]`);
+                if (nextBtn) {
+                    nextBtn.focus();
+                }
+            }
+        });
+    });
+    
+    // مدیریت Enter در فیلدهای صرف فعل
+    const verbFields = ['save-verb-present', 'save-verb-past', 'save-verb-perfect'];
+    verbFields.forEach((fieldId, index) => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // به فیلد بعدی برو یا به دکمه ذخیره
+                    if (index < verbFields.length - 1) {
+                        const nextField = document.getElementById(verbFields[index + 1]);
+                        if (nextField) {
+                            nextField.focus();
+                            nextField.select();
+                        }
+                    } else {
+                        document.getElementById('save-analyzed-word-btn').focus();
+                    }
+                }
+            });
+        }
+    });
+    
+    // مدیریت Enter در دکمه ذخیره نهایی
+    document.getElementById('save-analyzed-word-btn')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-analyzed-word-btn').click();
+        }
+    });
+    
+    // مدیریت Enter در دکمه انصراف
+    document.getElementById('cancel-save-analyzed-btn')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('cancel-save-analyzed-btn').click();
+        }
+    });
+    
+    // مدیریت Tab برای پیمایش بهتر
+    form.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            // اطمینان از پیمایش منطقی
+            const focusableElements = form.querySelectorAll(
+                'input, select, button, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            
+            const focusedIndex = Array.from(focusableElements).indexOf(document.activeElement);
+            
+            if (e.shiftKey && focusedIndex === 0) {
+                // اگر Shift+Tab در اولین المان، به انتها برو
+                e.preventDefault();
+                focusableElements[focusableElements.length - 1].focus();
+            } else if (!e.shiftKey && focusedIndex === focusableElements.length - 1) {
+                // اگر Tab در آخرین المان، به ابتدا برگرد
+                e.preventDefault();
+                focusableElements[0].focus();
+            }
+        }
+    });
+};
+
+// فراخوانی تابع در انتهای setupSaveAnalyzedFormEvents
+setupEnterNavigation();
 }
 // این متد را جایگزین متد قبلی کنید
 async searchInDatabase(text, language) {
@@ -5487,9 +5698,9 @@ renderTranslate() {
                 </div>
                 
                 <div class="action-group">
-                    <button class="action-btn save-btn" id="save-translation">
+    <button class="action-btn save-btn" id="save-translation" tabindex="0">
     <i class="fas fa-magic"></i>
-    <span>ذخیره هوشمند</span>
+    <span>ذخیره هوشمند (Enter)</span>
 </button>
                 </div>
             </div>

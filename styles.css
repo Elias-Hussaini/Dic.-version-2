@@ -7935,3 +7935,48 @@ body:not(.dark-mode) .user-message .message-content {
         font-size: 11px !important;
     }
 }
+/* استایل برای بنر تحلیل خودکار */
+.auto-analysis-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideInDown 0.5s ease;
+}
+
+.auto-analysis-banner i {
+    font-size: 1.2rem;
+}
+
+/* انیمیشن‌ها */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* استایل برای دکمه ذخیره هوشمند */
+#save-translation {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    animation: pulse 2s infinite;
+}
+
+#save-translation:hover {
+    animation: none;
+    transform: scale(1.05);
+}
