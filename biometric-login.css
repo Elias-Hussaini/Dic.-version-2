@@ -12,7 +12,7 @@
     font-size: 32px;
     margin-bottom: 10px;
     background: linear-gradient(135deg, #667eea, #764ba2, #00d4aa);
-    -webkit-background-clip: text;
+    
     -webkit-text-fill-color: transparent;
     animation: gradientShift 3s ease infinite;
     background-size: 200% 200%;

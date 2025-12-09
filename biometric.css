@@ -57,7 +57,7 @@
     font-size: 28px;
     margin-bottom: 10px;
     background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
+
     -webkit-text-fill-color: transparent;
     display: inline-block;
 }
