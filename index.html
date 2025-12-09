@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="biometric-login.css">
-    <link rel="stylesheet" href="biometric.css">
-    
     
     <!-- لینک مانیفست و تنظیمات PWA -->
 <link rel="manifest" href="./manifest.json">
@@ -21,14 +18,7 @@
 <link rel="apple-touch-icon" href="./icon-512.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- لینک‌های بیومتریک -->
-<link rel="stylesheet" href="./biometric/biometric.css">
-<link rel="stylesheet" href="./biometric/biometric-login.css">
 
-<!-- برای WebAuthn -->
-<script src="https://cdn.jsdelivr.net/npm/@simplewebauthn/browser@7.2.0/dist/bundle/index.umd.min.js"></script>
-<script src="./biometric/biometric.js" defer></script>
-<script src="./biometric/biometric-auth.js" defer></script>
 <!-- متا تگ‌های توصیفی -->
 <meta name="application-name" content="دیکشنری آلمانی-فارسی">
 <meta name="mobile-web-app-capable" content="yes">
@@ -180,25 +170,7 @@
 </head>
 <body>
     <div class="container">
-       <!-- صفحه ورود بیومتریک (مخفی) -->
-<div id="biometric-login-overlay" class="biometric-overlay" style="display: none;">
-    <div class="biometric-login-container" id="biometric-login-container">
-        <!-- محتوا توسط biometric.js پر می‌شود -->
-    </div>
-</div>
-
-<!-- صفحه تنظیمات بیومتریک (مخفی) -->
-<div id="biometric-setup-modal" class="modal" style="display: none;">
-    <div class="modal-content biometric-modal">
-        <div class="modal-header">
-            <h3>🔐 تنظیمات ورود امن با Face ID</h3>
-            <button class="close-modal">&times;</button>
-        </div>
-        <div class="modal-body" id="biometric-setup-content">
-            <!-- محتوا توسط biometric.js پر می‌شود -->
-        </div>
-    </div>
-</div> <!-- سایدبار -->
+        <!-- سایدبار -->
         <div class="sidebar">
             <div class="logo">
                 
@@ -1004,11 +976,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 </script>
-
+    <script src="https://js.puter.com/v2/"></script>
     <script src="./scripts.js"></script>
-      <script src="./biometric-auth.js"></script>  
-        <script src="./biometric.js"></script>
-
     <script src="./sw.js"></script>
     <script src="./install.js"></script>
     <script src="./responsive.js"></script>

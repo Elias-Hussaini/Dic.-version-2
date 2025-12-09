@@ -7980,3 +7980,177 @@ body:not(.dark-mode) .user-message .message-content {
     animation: none;
     transform: scale(1.05);
 }
+
+
+/* اضافه به فایل CSS */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #3498db;
+    border-radius: 50%;
+    animation: typing 1.5s infinite;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.typing-indicator span:nth-child(4) {
+    background: none;
+    width: auto;
+    height: auto;
+    color: #666;
+    font-size: 14px;
+    animation: none;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    30% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* رفع مشکل دکمه‌های چت در موبایل */
+@media (max-width: 768px) {
+    /* حذف placeholder بزرگ */
+    .chat-input-textarea::placeholder {
+        font-size: 14px !important;
+        padding-right: 5px !important;
+        line-height: 1.4 !important;
+        opacity: 0.7 !important;
+    }
+    
+    /* مرتب کردن کادر ورودی */
+    .input-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 10px !important;
+    }
+    
+    /* مرتب کردن دکمه‌ها در یک ردیف */
+    .input-main-buttons {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 10px !important;
+        order: 1 !important;
+    }
+    
+    /* دکمه‌های سمت راست (میکروفون و ایموجی) */
+    .input-actions-right {
+        display: flex !important;
+        gap: 8px !important;
+        order: 2 !important;
+        position: static !important;
+        margin: 0 !important;
+    }
+    
+    /* دکمه ارسال */
+    .send-message-btn {
+        order: 3 !important;
+        min-width: 80px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* دکمه‌های اکشن */
+    .input-action-btn {
+        width: 36px !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* کادر متن */
+    .chat-input-textarea {
+        order: 0 !important;
+        width: 100% !important;
+        min-height: 50px !important;
+        max-height: 80px !important;
+        padding: 12px 15px !important;
+        margin-bottom: 10px !important;
+        font-size: 14px !important;
+    }
+    
+    /* حذف فاصله اضافی */
+    .input-actions-left {
+        display: none !important;
+    }
+    
+    /* حذف متن placeholder اضافی در موبایل */
+    .chat-input-textarea::placeholder {
+        content: "سوال خود را بنویسید..." !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+}
+
+/* برای گوشی‌های کوچک‌تر */
+@media (max-width: 480px) {
+    .chat-input-textarea::placeholder {
+        font-size: 13px !important;
+    }
+    
+    .input-main-buttons {
+        gap: 8px !important;
+    }
+    
+    .send-message-btn {
+        min-width: 70px !important;
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .input-action-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+    }
+}
