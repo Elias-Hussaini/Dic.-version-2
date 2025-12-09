@@ -1,5 +1,128 @@
 
+/**
+ * scripts.js
+ * توابع کمکی و رفع خطاهای عمومی
+ */
 
+// =====================
+// Base64 Safe Functions
+// =====================
+
+/**
+ * تبدیل ایمن به Base64 (URL-safe)
+ */
+function safeBtoa(str) {
+    try {
+        const base64 = btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, 
+            function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (error) {
+        console.error('خطا در safeBtoa:', error);
+        return '';
+    }
+}
+
+/**
+ * رمزگشایی ایمن از Base64
+ */
+function safeAtob(base64) {
+    try {
+        // اضافه کردن padding اگر نیاز باشد
+        let str = base64.replace(/-/g, '+').replace(/_/g, '/');
+        const padding = str.length % 4;
+        if (padding) {
+            str += '='.repeat(4 - padding);
+        }
+        
+        const decoded = atob(str);
+        return decodeURIComponent(decoded.split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    } catch (error) {
+        console.error('خطا در safeAtob:', error);
+        return '';
+    }
+}
+
+/**
+ * تبدیل ArrayBuffer به Base64
+ */
+function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return safeBtoa(binary);
+}
+
+/**
+ * تبدیل Base64 به ArrayBuffer
+ */
+function base64ToArrayBuffer(base64) {
+    const binaryString = safeAtob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+// =====================
+// Error Handler
+// =====================
+
+window.addEventListener('error', function(e) {
+    console.error('خطای جهانی:', e.error);
+    
+    // جلوگیری از نمایش خطاهای atob/btoa به کاربر
+    if (e.error.message && e.error.message.includes('atob') || e.error.message.includes('btoa')) {
+        console.warn('خطای Base64 نادیده گرفته شد');
+        e.preventDefault();
+        return false;
+    }
+    
+    // نمایش پیام دوستانه به کاربر
+    showErrorToast('خطایی رخ داده است. لطفاً صفحه را رفرش کنید.');
+    return false;
+});
+
+// =====================
+// Utility Functions
+// =====================
+
+function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'error-toast';
+    toast.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// =====================
+// Initialize
+// =====================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ scripts.js loaded successfully');
+    
+    // اضافه کردن event listener برای خطاهای async
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Promise rejected:', event.reason);
+        event.preventDefault();
+    });
+});
 // app.js
 document.addEventListener('DOMContentLoaded', function() {
   // =====================
@@ -84,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.loadCustomization();
          this.setupSidebarQuickSearch();
           this.setupScrollManagement();
+          this.initBiometric();
       // Enable service worker for PWA
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
@@ -315,7 +439,25 @@ async addMessageToHistory(sender, message, options = {}) {
             }, 100);
         }
     }
+    initBiometric() {
+    // بررسی فعال بودن بیومتریک
+    const isBiometricEnabled = localStorage.getItem('biometric_enabled') === 'true';
     
+    if (isBiometricEnabled) {
+        // نمایش صفحه ورود بعد از 1 ثانیه
+        setTimeout(() => {
+            if (window.biometricUI) {
+                window.biometricUI.showLoginScreen();
+            }
+        }, 1000);
+    }
+    
+    // اضافه کردن بخش تنظیمات بیومتریک به تنظیمات اصلی
+    this.integrateBiometricSettings();
+}
+integrateBiometricSettings() {
+   
+}
   async typeMessageGradually(text) {
     const chatHistory = document.getElementById('chat-history');
     if (!chatHistory) return;
@@ -7781,6 +7923,48 @@ async renderFavorites() {
     </div>
 </div>
 
+<div class="word-card mt-4">
+    <h3 class="mb-3">🔐 ورود امن با Face ID</h3>
+    
+    <div class="biometric-settings-card">
+        <div id="biometric-status">
+            <!-- وضعیت توسط biometric.js پر می‌شود -->
+        </div>
+        
+        <div class="biometric-controls mt-3">
+            <button class="btn btn-primary" id="enable-biometric-btn">
+                <i class="fas fa-fingerprint"></i>
+                فعال‌سازی Face ID
+            </button>
+            
+            <button class="btn btn-outline" id="test-biometric-btn" style="display: none;">
+                <i class="fas fa-play-circle"></i>
+                تست تشخیص
+            </button>
+            
+            <button class="btn btn-danger" id="disable-biometric-btn" style="display: none;">
+                <i class="fas fa-trash-alt"></i>
+                غیرفعال‌سازی
+            </button>
+            
+            <button class="btn btn-secondary biometric-settings-btn">
+                <i class="fas fa-cog"></i>
+                تنظیمات پیشرفته
+            </button>
+        </div>
+        
+        <div id="biometric-settings" style="display: none; margin-top: 20px;">
+            <!-- تنظیمات پیشرفته -->
+        </div>
+        
+        <div id="login-history" style="display: none; margin-top: 20px;">
+            <h5>تاریخچه ورود</h5>
+            <div class="history-list" id="history-list">
+                <!-- تاریخچه پر می‌شود -->
+            </div>
+        </div>
+    </div>
+</div>
     `;
     
     // بقیه event listeners تنظیمات...

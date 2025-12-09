@@ -1,0 +1,571 @@
+/* استایل‌های اصلی بیومتریک */
+:root {
+    --biometric-primary: #4361ee;
+    --biometric-success: #00d4aa;
+    --biometric-error: #ff4757;
+    --biometric-warning: #ffa502;
+    --biometric-bg: #0f172a;
+    --biometric-card: #1e293b;
+    --biometric-text: #f8fafc;
+}
+
+/* صفحه ورود بیومتریک */
+.biometric-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.biometric-login-container {
+    background: var(--biometric-card);
+    border-radius: 24px;
+    padding: 40px;
+    width: 90%;
+    max-width: 480px;
+    color: var(--biometric-text);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* هدر ورود */
+.biometric-header {
+    margin-bottom: 30px;
+}
+
+.biometric-header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.biometric-header p {
+    color: #94a3b8;
+    font-size: 16px;
+}
+
+/* انیمیشن تشخیص صورت */
+.face-scan-section {
+    margin: 40px 0;
+    position: relative;
+}
+
+.face-outline {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    border: 3px solid rgba(67, 97, 238, 0.3);
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.face-circle {
+    width: 140px;
+    height: 140px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    border-radius: 50%;
+    background: rgba(67, 97, 238, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.face-features {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.eye {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    top: 30px;
+    animation: blink 3s infinite;
+}
+
+.eye.left {
+    left: 15px;
+}
+
+.eye.right {
+    right: 15px;
+}
+
+@keyframes blink {
+    0%, 45%, 55%, 100% { height: 24px; }
+    48%, 52% { height: 4px; }
+}
+
+.mouth {
+    position: absolute;
+    width: 50px;
+    height: 20px;
+    bottom: 25px;
+    left: 25px;
+    border-bottom: 4px solid rgba(255, 255, 255, 0.9);
+    border-radius: 0 0 25px 25px;
+    animation: smile 4s infinite;
+}
+
+@keyframes smile {
+    0%, 100% { width: 50px; }
+    50% { width: 60px; }
+}
+
+/* اسکن لیزری */
+.scan-laser {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        var(--biometric-success),
+        transparent
+    );
+    top: 0;
+    left: 0;
+    animation: laserScan 2s linear infinite;
+    box-shadow: 0 0 15px var(--biometric-success);
+}
+
+@keyframes laserScan {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+/* پرتوهای نور */
+.light-rays {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.ray {
+    position: absolute;
+    background: linear-gradient(to right, 
+        transparent, 
+        rgba(0, 212, 170, 0.4), 
+        transparent
+    );
+    animation: rayPulse 3s infinite;
+}
+
+.ray-1 {
+    width: 100%;
+    height: 2px;
+    top: 20%;
+    animation-delay: 0s;
+}
+
+.ray-2 {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    animation-delay: 0.5s;
+}
+
+.ray-3 {
+    width: 100%;
+    height: 2px;
+    top: 80%;
+    animation-delay: 1s;
+}
+
+.ray-4 {
+    width: 2px;
+    height: 100%;
+    left: 20%;
+    animation-delay: 1.5s;
+}
+
+.ray-5 {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    animation-delay: 2s;
+}
+
+.ray-6 {
+    width: 2px;
+    height: 100%;
+    left: 80%;
+    animation-delay: 2.5s;
+}
+
+@keyframes rayPulse {
+    0% { opacity: 0; transform: scaleX(0); }
+    50% { opacity: 1; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(0); }
+}
+
+/* متن وضعیت */
+.scan-status {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    min-height: 30px;
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+/* دکمه‌ها */
+.biometric-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.biometric-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    min-width: 180px;
+}
+
+.biometric-btn.primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.biometric-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--biometric-text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.biometric-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.biometric-btn:active {
+    transform: translateY(0);
+}
+
+.biometric-btn i {
+    font-size: 18px;
+}
+
+/* پیشرفت بارگذاری */
+.progress-ring {
+    margin: 30px auto;
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-ring-circle {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+.progress-ring-bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+.progress-ring-progress {
+    stroke: var(--biometric-success);
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    transition: stroke-dashoffset 0.5s ease;
+    animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+    0%, 100% { stroke-width: 8; }
+    50% { stroke-width: 10; }
+}
+
+/* انیمیشن‌های موفقیت/خطا */
+.success-animation {
+    animation: successBounce 0.8s ease;
+}
+
+@keyframes successBounce {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.error-animation {
+    animation: errorShake 0.5s ease;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* مودال تنظیمات */
+.biometric-modal {
+    background: var(--biometric-card);
+    color: var(--biometric-text);
+    max-width: 600px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+/* تنظیمات بیومتریک */
+.biometric-settings {
+    display: grid;
+    gap: 25px;
+}
+
+.setting-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    border-left: 4px solid var(--biometric-primary);
+}
+
+.setting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.setting-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.setting-title i {
+    color: var(--biometric-primary);
+    font-size: 20px;
+}
+
+.setting-toggle {
+    position: relative;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+/* تاریخچه ورود */
+.login-history {
+    margin-top: 30px;
+}
+
+.history-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.history-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid transparent;
+    transition: all 0.3s;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.history-item.success {
+    border-left-color: var(--biometric-success);
+}
+
+.history-item.failed {
+    border-left-color: var(--biometric-error);
+}
+
+.history-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+}
+
+.history-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.history-status {
+    font-size: 24px;
+}
+
+/* پاسخگو بودن */
+@media (max-width: 768px) {
+    .biometric-login-container {
+        padding: 25px;
+        margin: 20px;
+    }
+    
+    .biometric-buttons {
+        flex-direction: column;
+    }
+    
+    .biometric-btn {
+        width: 100%;
+    }
+    
+    .face-outline {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .face-circle {
+        width: 110px;
+        height: 110px;
+        top: 20px;
+        left: 20px;
+    }
+}
